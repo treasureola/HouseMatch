@@ -5,11 +5,10 @@ Last updated: [ YYYY-MM-DD ]
 ## Team Name: [Insert Project Name]
 
 ### Team Members:
-- [Member 1 Name]
-- [Member 2 Name]
-- [Member 3 Name]
-- [Member 4 Name]
-- [Member 5 Name]
+- Olamide Treasure Oluwalade
+- Kweku Awuah
+- Issouf Diarrassouba
+- Sylmira Kailey
 
 ## 1. Project Objectives
 *Clearly state the overall purpose of your team and briefly describe your senior design project.*
