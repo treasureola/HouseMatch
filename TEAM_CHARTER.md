@@ -1,6 +1,6 @@
 # sd-tiks
 # Team Charter Template
-Last updated: [ YYYY-MM-DD ]
+Last updated: 2024-10-04
 
 ## Team Name: [Insert Project Name]
 
@@ -13,39 +13,52 @@ Last updated: [ YYYY-MM-DD ]
 ## 1. Project Objectives
 *Clearly state the overall purpose of your team and briefly describe your senior design project.*
 
-### 1.1 Specific Goals
-*Include a list of the specific components of your solution*
+Create a personalized real estate matching platform: Develop an app that uses AI to recommend properties that closely align with users' preferences and needs. Enhance the home-buying and renting experience: Make the process of finding a home more efficient, enjoyable, and stress-free. Leverage technology to improve the real estate industry: Utilize innovative technologies like AI and machine learning to transform the way people search for and find homes.
 
-*Example for building ChatGPT:*
-- *AI Model: A generative language model trained on large amounts of public data that can accurately and safely respond to user queries.*
-- *Compute-efficient backend: A highly scalable backend that can run the ai model and intelligently handle batching requests to optimize gpu efficiency*
-- *User-friendly web app: A website with a chat interface that allows users to interact with the model. The website should require authentication and use accounts to manage individual's chat history*
+### 1.1 Specific Goals
+
+The specific gaols for our project wil be to : 
+
+- Core Features and Functionality:
+    - Develop a robust property search engine: Ensure accurate and efficient property searches based on location, price, amenities, and other relevant criteria.
+    - Implement a personalized recommendation algorithm: Create a sophisticated algorithm that accurately matches users with properties based on their preferences and behavior.
+    - Integrate a user-friendly messaging system: Enable seamless communication between users and landlords within the app.
+    - Provide detailed property information: Display comprehensive information about properties, including photos, descriptions, amenities, and neighborhood details.
+    - Offer a visually appealing and intuitive user interface: Design the app with a clean and modern interface that is easy to navigate.
 
 ## 2. Roles and Responsibilities
 *Describe the different roles each team member will play and their primary focus area. Identify a "project lead" responsible for managing deadlines and organizing the rest of the team. Identify who is responsible for any logistics roles (managing sprint boards etc)*
 
+
 ### 2.1 Team Lead
 
-The team lead, *[Member Name]*, is responsible for managing team deadlines and keeping everyone on track. Their concrete responsibilities include:
+The team lead, *[Sylmira]*, is responsible for managing team deadlines and keeping everyone on track. Their concrete responsibilities include:
 - reminding team members to post weekly status updates
 - take notes during meetings and share in slack channel
 - schedule time for team to sync
-- *add any other duties here*
+
 
 ### 2.2 Member Roles
 *Complete the member roles table*
 
 | Member Name | Strengths  | Technical Responsibilities                |
 | ----------- | ---------- | ----------------------------------------- |
-| [Member 1]  | ml, python | Training core language model              |
-| [Member 2]  | ui, ux     | Build front end, prototype chat interface |
+| [Kweku_Awuah]  | FrontEnd, Swift, AWS(Deplyment)| Building the frontend of the IOS APP, Deploying the AWS, Design and implementation of the user interface (UI)           |
+| [Olamide_Treasure_Oluwalade]  | Python, Security, Machine Learning   | Implementation of data validation and security measures,  Error handling and exception management|
+| [Sylmira_Kailey]  | ui , ux , database sytems management, algorithms | Storage of user data, property information, and other relevant data,    Design and setup of the database schema,  Ensuring data integrity and security        |
+| [Issouf_Diarrasspuba]  | Backend, Python, MAchine learning, database| Development of the server-side logic for handling user requests and data, Integration with the real estate data API|
+
 
 ### 2.3 Logistics
 *Adjust this to assign team members tasks or define a rotation policy.*
 
-- [Member] : responsible for creating weekly status update tickets and moving them to done as the sprint progresses
-- [Member] : responsible for taking notes during instructor meeting and posting them to slack
-- ...
+- [treasure] : responsible for creating weekly status update tickets and moving them to done as the sprint progresses
+- [Rotation_Weekly] : responsible for taking notes during instructor meeting and posting them to slack
+- [Sylmira] : Team Lead 
+- [Kweku] : Setting up and confirming Meeting Times for whenevr we meet
+- [Issouf] : responsible for weekly reminders and communication
+
+
 
 ## 3. Communication Guidelines
 
@@ -53,13 +66,13 @@ The team lead, *[Member Name]*, is responsible for managing team deadlines and k
 - We will use slack for async communication between team members, mentors, and instructors
 - We will use Zoom for weekly meetings with instructors and mentors
 - We will use github projects to track sprint progress and post weekly updates
-- *List any other communication tools you will use*
+- We will use imessgae for constant communication 
 
 
 ### 3.2 Meetings
 - Weekly meetings with the team mentor will be held *Wednesday 8pm* over Zoom.
-- Weekly meetings with the instructor will be help *Tuesday 3pm* over Zoom
-- *Describe when the team will meet as a group and on what cadence and for what purpose*
+- Weekly meetings with the instructor will be help *Tuesday 3:30pm* over Zoom
+- Weekly meetings with group will be held on Sundays over Zoom
 
 ### 3.3 Documentation & Reporting
 - Meeting notes will be documented and shared over Slack within 24 hours of each meeting.
@@ -87,19 +100,19 @@ The team lead, *[Member Name]*, is responsible for managing team deadlines and k
 - **Constructive Feedback**: Feedback should be given and received constructively, focusing on improving the project.
 
 ## 6. Resource Allocation
-- **Time Commitment**: All members are expected to spend ~10 hours of time outside of class per week on the project.
+- **Time Commitment**: All members are expected to spend no less than 2 hours of time outside of class per week on the project.
 - **Workload Distribution**: Tasks will be assigned based on each member's expertise and availability. Each member is expected to complete their assigned tasks within the agreed-upon deadlines. 
-- **Shared Resources:** *List any shared resources (compute, hardware, etc) and how to access them*
+- **Shared Resources:** 
 
 ## 7. Signatures
 By signing below, each team member agrees to uphold this team charter (add names as separate commits):
-- [Member 1] , [Date]
+- [Issouf_Diarrassouba] , [2024-10-04]
 - [Member 2] , [Date]
 - [Member 3] , [Date]
 - [Member 4] , [Date]
 
 ## 8. Charter Review and Updates
-This charter was last updated on [YYYY-MM-DD].
+This charter was last updated on [2024-10-04].
 
 It was previously modified on:
 - [YYYY-MM-DD]
