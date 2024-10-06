@@ -108,7 +108,7 @@ The team lead, *[Sylmira]*, is responsible for managing team deadlines and keepi
 By signing below, each team member agrees to uphold this team charter (add names as separate commits):
 - [Issouf_Diarrassouba] , [2024-10-04]
 - [Kweku_Awuah] , [2024-10-04]
-- [Member 3] , [Date]
+- [Sylmira_Kailey] , [2024-10-06]
 - [Member 4] , [Date]
 
 ## 8. Charter Review and Updates
