@@ -109,10 +109,10 @@ By signing below, each team member agrees to uphold this team charter (add names
 - [Issouf_Diarrassouba] , [2024-10-04]
 - [Kweku_Awuah] , [2024-10-04]
 - [Sylmira_Kailey] , [2024-10-06]
-- [Member 4] , [Date]
+- [Olamide_Treasure_Oluwalade] , [2024-10-06]
 
 ## 8. Charter Review and Updates
-This charter was last updated on [2024-10-04].
+This charter was last updated on [2024-10-06].
 
 It was previously modified on:
 - [YYYY-MM-DD]
