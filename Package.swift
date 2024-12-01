@@ -15,11 +15,15 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.6.0"),
         // 🔵 Non-blocking, event-driven networking for Swift. Used for custom executors
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
+        // importing JWT
+        .package(url: "https://github.com/vapor/jwt.git", from: "5.0.0-rc"),
+        
     ],
     targets: [
         .executableTarget(
             name: "App",
             dependencies: [
+                .product(name: "JWT", package: "jwt"),
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
                 .product(name: "Vapor", package: "vapor"),

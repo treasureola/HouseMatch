@@ -2,6 +2,8 @@ import NIOSSL
 import Fluent
 import FluentSQLiteDriver
 import Vapor
+import JWT
+
 
 // configures your application
 public func configure(_ app: Application) async throws {
@@ -9,8 +11,13 @@ public func configure(_ app: Application) async throws {
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
     app.databases.use(DatabaseConfigurationFactory.sqlite(.file("db.sqlite")), as: .sqlite)
+    
+    await app.jwt.keys.add(hmac: "secret", digestAlgorithm: .sha256)
+
+    app.middleware.use(UserAuthenticator())
 
     app.migrations.add(CreateTodo())
+    try await app.autoMigrate()
     // register routes
     try routes(app)
 }
