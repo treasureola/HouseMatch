@@ -4,6 +4,10 @@ import JWT
 
 // Issouf DIarrassouba =--> Adding the routes
 
+
+
+import Vapor
+
 // Define the routes
 func routes(_ app: Application) throws {
 //    NEED TO ADD THE UTHENTICATION PROTECTION TO THE DIFFERENT ROUTES THAT NEED IT
@@ -70,7 +74,8 @@ func routes(_ app: Application) throws {
         case all([Property])
     }
 
-    
+    // searching for the properties in the db
+    // have not added the properties into the db yet ans cant mdoify until main db is set and functional --> dont wana make chabnges for a prototype db
     app.get("search") { req async throws -> SearchResponse in
         // Decode pagination parameters (optional)
         let page = try? req.query.get(Int.self, at: "page")
@@ -114,7 +119,32 @@ func routes(_ app: Application) throws {
             return .all(properties)
         }
     }
-    // Database Works
+    
+    
+// Obtaining the listings from the rapid api --> displayed in termianal
+    app.get("properties") { req async throws -> [PropertyListing] in
+        let apiURL = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city%3ANew%20York%2C%20NY&sortBy=best_match"
+        let headers: HTTPHeaders = [
+            "x-rapidapi-key": "59c729cedfmshbbe489773d471f3p144a74jsn34222e288e36",
+            "x-rapidapi-host": "realtor-search.p.rapidapi.com"
+        ]
+
+        let clientResponse = try await req.client.get(URI(string: apiURL), headers: headers)
+        guard let buffer = clientResponse.body else {
+            throw Abort(.badRequest, reason: "No data received from the API")
+        }
+
+        let data = Data(buffer: buffer)
+        print(String(data: data, encoding: .utf8) ?? "Invalid response") // Debugging
+
+        // Decode the JSON response
+        let apiResponse = try JSONDecoder().decode(APIResponse.self, from: data)
+        return apiResponse.data.results
+    }
+
+
+    
+// Database Works --> Testing the functionilty of the prototyype db with this route
     app.post("seed") { req -> EventLoopFuture<HTTPStatus> in
         let properties = [
             Property(name: "Luxury Villa", city: " New York City", state: "New York",   price: 1000, propertyType: "Villa", capacity: 5, amenities: ["Pool", "WiFi"], isAvailable: true),
@@ -122,5 +152,7 @@ func routes(_ app: Application) throws {
         ]
         return properties.map { $0.save(on: req.db) }.flatten(on: req.eventLoop).transform(to: .ok)
     }
+    
+
 
 }
