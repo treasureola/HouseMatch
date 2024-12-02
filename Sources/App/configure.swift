@@ -14,7 +14,7 @@ public func configure(_ app: Application) async throws {
     
     await app.jwt.keys.add(hmac: "secret", digestAlgorithm: .sha256)
 
-    app.middleware.use(UserAuthenticator())
+   // app.middleware.use(UserAuthenticator()) // Can not have this here as it prevents my code from being run since we are attaching an authentication to every route even those that doesnt need the authentication which should not happen 
 
     app.migrations.add(CreateTodo())
     try await app.autoMigrate()
