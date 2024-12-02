@@ -11,9 +11,9 @@ import JWT
 
 // ----------------------------------------------------- Creating User ----------------------------------------------------- \\
 
-struct CreateUser: Migration {
-    func prepare(on database: Database) -> EventLoopFuture<Void> {
-        database.schema("users")
+struct CreateUser: AsyncMigration {
+    func prepare(on database: Database) async throws {
+        try await database.schema("users")
             .id()
             .field("email", .string, .required)
             .field("passwordHash", .string, .required)
@@ -21,12 +21,10 @@ struct CreateUser: Migration {
             .create()
     }
 
-    func revert(on database: Database) -> EventLoopFuture<Void> {
-        database.schema("users").delete()
+    func revert(on database: Database) async throws {
+        try await database.schema("users").delete()
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------------- \\
+}// ---------------------------------------------------------------------------------------------------------------------------- \\
 
 //Use @unchecked Sendable only if you’re confident that your model instances won’t be accessed concurrently in unsafe ways.
 final class User: Model, Content, Authenticatable, @unchecked Sendable{
