@@ -11,6 +11,9 @@ struct CardView: View {
     var TypeOfbuilding: String
     var imageName: String
     var descriptions: String
+
+    var description: String
+
     
     @State private var offset: CGSize = .zero //location of the card, where we drag it and where it ends up
     @State private var color: Color = .blue  //initial state of the color
@@ -25,7 +28,10 @@ struct CardView: View {
         
         ZStack {
             Rectangle()
+
                 .frame(width: 370 , height: 520)
+
+                .frame(width: 380 , height: 530)
                 .border(.white, width: 6.0)
                 .cornerRadius(4)
                 .foregroundColor(color.opacity(0.9))
@@ -40,6 +46,15 @@ struct CardView: View {
                     .frame(height: 100)
                     .cornerRadius(10)
                 Text(descriptions)
+
+                Image(imageName)
+                    .resizable()
+                    .frame(width: 320)
+//                    .scaledToFit()
+                    .frame(height: 300)
+                    .cornerRadius(10)
+
+                Text(description)
                     .font(.body)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -104,5 +119,6 @@ struct CardView: View {
 }
 
 #Preview {
-    CardView(TypeOfbuilding: "Townhouse", imageName: "house", descriptions: "A single-family property that shares walls with other adjacent homes, part of a homeowner’s association (HOA)")
+    CardView(TypeOfbuilding: "Townhouse", imageName: "house", descriptions: "A single-family property that shares walls with other adjacent homes, part of a homeowner’s association (HOA)", description: <#String#>)
+    CardView(TypeOfbuilding: "Multi-Family Home", imageName: "Multi-Family_Home", descriptions: <#String#>, description: "A residential multi-family building (2-4 units)")
 }
