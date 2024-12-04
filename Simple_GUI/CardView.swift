@@ -10,10 +10,7 @@ import SwiftUI
 struct CardView: View {
     var TypeOfbuilding: String
     var imageName: String
-    var descriptions: String
-
     var description: String
-
     
     @State private var offset: CGSize = .zero //location of the card, where we drag it and where it ends up
     @State private var color: Color = .blue  //initial state of the color
@@ -28,9 +25,6 @@ struct CardView: View {
         
         ZStack {
             Rectangle()
-
-                .frame(width: 370 , height: 520)
-
                 .frame(width: 380 , height: 530)
                 .border(.white, width: 6.0)
                 .cornerRadius(4)
@@ -41,11 +35,6 @@ struct CardView: View {
                     .font(.largeTitle)
                     .foregroundColor(.white)
                     .bold()
-                Image(systemName: imageName)
-                    .resizable()
-                    .frame(height: 100)
-                    .cornerRadius(10)
-                Text(descriptions)
 
                 Image(imageName)
                     .resizable()
@@ -119,6 +108,5 @@ struct CardView: View {
 }
 
 #Preview {
-    CardView(TypeOfbuilding: "Townhouse", imageName: "house", descriptions: "A single-family property that shares walls with other adjacent homes, part of a homeowner’s association (HOA)", description: <#String#>)
-    CardView(TypeOfbuilding: "Multi-Family Home", imageName: "Multi-Family_Home", descriptions: <#String#>, description: "A residential multi-family building (2-4 units)")
+    CardView(TypeOfbuilding: "Multi-Family Home", imageName: "Multi-Family_Home", description: "A residential multi-family building (2-4 units)")
 }
