@@ -10,6 +10,7 @@
 
 import SwiftUI
 
+//This is the front page/Welcome page of the application
 struct ContentView: View {
     var body: some View {
         NavigationView{
@@ -21,7 +22,7 @@ struct ContentView: View {
                 Spacer()
                     .bold()
                     .font(.largeTitle)
-                Image(.houseA)
+                Image(.houseA)  //HouseMatch logo
                     .cornerRadius(50)
                     .imageScale(.large)
                     .foregroundStyle(.blue)
@@ -30,7 +31,7 @@ struct ContentView: View {
                     .font(.largeTitle)
                 
                 Spacer()
-                               //Get Started button
+                    //The get Started button
                 NavigationLink(destination: AnotherScreen()){
                     Text("Get Started")
                         .font(.title2)
@@ -46,8 +47,9 @@ struct ContentView: View {
         }
     }
 }
-            //the view you see when you press "Get Started".
-            //the Sign Up page
+
+//This is the view you see when you press "Get Started".
+//The Sign Up page
 struct AnotherScreen: View {
     @State private var first_name = ""
     @State private var last_name = ""
@@ -56,9 +58,9 @@ struct AnotherScreen: View {
     @State private var confirmpassword = ""
             
         //validation check for all inputs
-    @State private var displayAlert = false
-    @State private var alertMessage = ""
-    @State private var GotoSignUpScreen = false
+//    @State private var displayAlert = false
+//    @State private var alertMessage = ""
+//    @State private var GotoSignUpScreen = false
 
     var body: some View {
         VStack(alignment: .center){
@@ -70,16 +72,19 @@ struct AnotherScreen: View {
                 .font(.subheadline)
             
             Spacer()
+            //input for firstname
             TextField("Firstname", text: $first_name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
             
+            //input for lastname
             TextField("Lastname", text: $last_name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
             
+            //input for email
             TextField("Email", text: $email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.emailAddress)
@@ -87,11 +92,13 @@ struct AnotherScreen: View {
                 .padding(.top, 6)
                 .padding(.horizontal)
             
+            //input for password
             SecureField("Password", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
             
+            //input for confirming password (must be the same as the )
             SecureField("Confirm Password", text: $confirmpassword)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
@@ -283,7 +290,7 @@ struct LoginScreen: View {
         
     
     
-    //the view for User to make House preferences/choices
+    //Te view for user/client to make House preferences/choices
     struct FindDreamHome: View {
         @State private var address = "Select Location"
         @State private var property_type = "Select Property Type"
@@ -428,13 +435,14 @@ struct LoginScreen: View {
                         .cornerRadius(10)
                 }
                 
-                .disabled(!arePreferencesValid())  //disable the link if arePreferencesValid() is invalid
+                .disabled(!arePreferencesValid())  //disables the link if arePreferencesValid() is invalid
                 .padding(.top, 20)
                 
                 .padding()
                 .navigationTitle("Dream Home")
             }
         }
+        //a function to check that all the inputs aren't empty and a selection has been made
         func arePreferencesValid() -> Bool {
             return address != "Select Location" &&
             property_type != "Select Property Type" &&
@@ -451,7 +459,7 @@ struct LoginScreen: View {
     
     
     
-    //this is the confirmation page after the user makes their preferences
+    //this is the confirmation page after the user/client makes their preferences
     struct ConfirmationPage: View{
         var address: String
         var propertyType : String
@@ -468,6 +476,7 @@ struct LoginScreen: View {
                 
                 Spacer()
                 
+                //This take in the inputs made from the FindDreeamHome Page and displays it on the confirmation page.
                 Text("Location: \(address)")
                 Text("Property Type: \(propertyType)")
                 Text("Price Range: \(price)")
@@ -501,7 +510,7 @@ struct LoginScreen: View {
     struct ThankYouPage: View{
         var body: some View{
             VStack{
-                Text("Thank you for your purchased property!")
+                Text("Thank you. Your housing preferences have been saved")
                     .font(.largeTitle)
                     .padding(.bottom, 20)
                 
