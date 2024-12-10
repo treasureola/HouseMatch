@@ -8,11 +8,11 @@ In our project, I was responsible for designing and developing the front end, wh
 Key Features of the Front End:
 
 1. User Account Management:
-  * Implemented functionality for user registration and authentication, enabling seamless sign-up and login processes.
+    * Implemented functionality for user registration and authentication, enabling seamless sign-up and login processes.
 2. Interactive Swipe Mechanism:
-  * Developed a swipe feature, allowing users to swipe left or right. This interaction helps gather insights into user preferences, which inform predictions and recommendations tailored to individual interests.
+    * Developed a swipe feature, allowing users to swipe left or right. This interaction helps gather insights into user preferences, which inform predictions and recommendations tailored to individual interests.
 3. Personalized Housing/Rental Preferences:
-  * Enabled users to set specific housing and rental preferences based on the available options, ensuring that they can easily find properties matching their criteria.
+    * Enabled users to set specific housing and rental preferences based on the available options, ensuring that they can easily find properties matching their criteria.
 
 
 Data Flow - Syl:
