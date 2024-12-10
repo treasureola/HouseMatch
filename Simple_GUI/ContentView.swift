@@ -14,7 +14,7 @@ import SwiftUI
 struct WelcomeView: View {
     var body: some View {
         NavigationView{
-            VStack {   //the Welcome page
+            VStack {   //stacking elements vertically
             
                 Text("Welcome to")
                     .font(.largeTitle)
@@ -495,7 +495,8 @@ struct LoginScreenView: View {
     }
     
     //a property struct to hold the building data
-struct Property: Hashable{
+    //we use hasable becuase we use 'Property struct' as the identifier in the ForEach loop
+struct Property: Hashable{  
         var typeOfBuilding: String
         var imageName: String
         var description: String
