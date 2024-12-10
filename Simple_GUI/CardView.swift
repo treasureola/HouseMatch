@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct CardView: View {
-    var TypeOfbuilding: String
+struct propertyCardView: View {
+    var typeOfBuilding: String
     var imageName: String
     var description: String
     
@@ -20,9 +20,7 @@ struct CardView: View {
             Text("Properties and Buildings")
                 .font(.largeTitle)
                 .bold()
-//                .padding(.top, 10)
                 .padding(.bottom, 30)
-        
         ZStack {
             Rectangle()
                 .frame(width: 380 , height: 530)
@@ -31,7 +29,7 @@ struct CardView: View {
                 .foregroundColor(color.opacity(0.9))
                 .shadow(radius: 4)
             VStack {
-                Text(TypeOfbuilding)
+                Text(typeOfBuilding)
                     .font(.largeTitle)
                     .foregroundColor(.white)
                     .bold()
@@ -39,18 +37,15 @@ struct CardView: View {
                 Image(imageName)
                     .resizable()
                     .frame(width: 320)
-//                    .scaledToFit()
                     .frame(height: 300)
                     .cornerRadius(10)
-
+                
                 Text(description)
                     .font(.body)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-                
             }
-
         }
         .offset(x: offset.width, y: offset.height * 0.4)
         .rotationEffect(.degrees(Double(offset.width / 40)))
@@ -71,18 +66,16 @@ struct CardView: View {
                 }
         )
     }
-    }
+}
   
- 
-    
     //moves the Card either left or right and get rid of it
     func swippingCard(width: CGFloat){
         switch width {
         case -500...(-150):    //for the left swiping
-            print("\(TypeOfbuilding) removed")
+            print("\(typeOfBuilding) removed")
             offset = CGSize(width: -500, height: 0)
         case 150...500:       //for the right swipinp
-            print("\(TypeOfbuilding) added")
+            print("\(typeOfBuilding) added")
             offset = CGSize(width: 500, height: 0)
         default:
             offset = .zero
@@ -101,12 +94,9 @@ struct CardView: View {
             color = .blue
             
         }
-        
     }
-    
-    
 }
 
 #Preview {
-    CardView(TypeOfbuilding: "Multi-Family Home", imageName: "Multi-Family_Home", description: "A residential multi-family building (2-4 units)")
+    propertyCardView(typeOfBuilding: "Multi-Family Home", imageName: "Multi-Family_Home", description: "A residential multi-family building (2-4 units)")
 }
