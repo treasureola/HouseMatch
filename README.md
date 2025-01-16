@@ -1,6 +1,18 @@
 # sd-tiks
 
 
+## January Goals
+- Integrate python code with swift sucessfully
+- Encode API details 
+## February Goals
+- Improve machine learning accuracy
+## March Goals
+- Integrate Machine learning with frontend and backend
+## April Goals
+-
+
+
+
 Frontend - Kweku:
 
 In our project, I was responsible for designing and developing the front end, which plays a crucial role in ensuring the application is user-friendly, supports seamless navigation, and integrates effectively with the backend functionality. My focus was on creating an intuitive and engaging interface to enhance the overall user experience.
