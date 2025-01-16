@@ -3,7 +3,9 @@
 
 ## January Goals
 - Integrate python code with swift sucessfully
-- Encode API details 
+- Encode API details
+- Intgegrate Backend with database
+- Integrate Frontend with database
 ## February Goals
 - Improve machine learning accuracy
 - Integrate Machine learning with frontend and backend
