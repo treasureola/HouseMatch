@@ -6,8 +6,9 @@
 - Encode API details 
 ## February Goals
 - Improve machine learning accuracy
-## March Goals
 - Integrate Machine learning with frontend and backend
+## March Goals
+- 
 ## April Goals
 -
 
