@@ -2,6 +2,7 @@
 
 
 ## January Goals
+- Create a basaic login page to integrate then branch off of it 
 - Frontend integrates with database
 - HostBackend on AWS Server 
 - Backend integrates with database
