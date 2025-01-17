@@ -3,10 +3,11 @@
 
 ## January Goals
 - Frontend integrates with database
+- HostBackend on AWS Server 
 - Backend integrates with database
 - backend integrates with machine learning
 - backed interates with frontend
-- Machine learning
+- Machine learning (Document Journey) 
   - Encode and include details data in the machine lerning model
 ## February Goals
 - Improve machine learning accuracy
