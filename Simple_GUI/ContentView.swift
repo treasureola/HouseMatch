@@ -56,7 +56,14 @@ struct SignUpView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
-            
+    
+    //Was newly added
+    @State private var firstNameError = ""
+    @State private var lastNameError = ""
+    @State private var emailError = ""
+    @State private var passwordError = ""
+    @State private var confirmPasswordError = ""
+    
     var body: some View {
         VStack(alignment: .center){
             
@@ -72,12 +79,27 @@ struct SignUpView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
+                .onChange(of: firstName) { validateFirstName()}   //Was newly added
+            
+            if !firstNameError.isEmpty {
+                            Text(firstNameError)
+                                .foregroundColor(.red)
+                                .font(.footnote)
+                        }
             
             //input for lastname
             TextField("Lastname", text: $lastName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
+                .onChange(of: lastName) { validateLastName()}    //Was newly added
+            
+            if !lastNameError.isEmpty {          //Was newly added
+                            Text(lastNameError)
+                                .foregroundColor(.red)
+                                .font(.footnote)
+                        }
+            
             
             //input for email
             TextField("Email", text: $email)
@@ -86,54 +108,133 @@ struct SignUpView: View {
                 .autocapitalization(.none)
                 .padding(.top, 6)
                 .padding(.horizontal)
+                .onChange(of: email) { validateEmail()}     //Was newly added
+            
+            if !emailError.isEmpty {     //Was newly added
+                           Text(emailError)
+                               .foregroundColor(.red)
+                               .font(.footnote)
+                       }
+            
+            
             
             //input for password
             SecureField("Password", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
+                .onChange(of: password) { validatePassword()}    //Was newly added
+            
+            if !passwordError.isEmpty {                       //Was newly added
+                           Text(passwordError)
+                               .foregroundColor(.red)
+                               .font(.footnote)
+                       }
             
             //input for confirming password (must be the same as the )
             SecureField("Confirm Password", text: $confirmPassword)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
+                .onChange(of: confirmPassword) { validateConfirmPassword()}     //Was newly added
+            
+            if !confirmPasswordError.isEmpty {                //Was newly added
+                          Text(confirmPasswordError)
+                              .foregroundColor(.red)
+                              .font(.footnote)
+                      }
             
             Spacer()
-            
-            NavigationLink(destination: SignUpTransitionView()){
-                Text("Sign up")
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(areInputsValid() ? Color.purple : Color.gray) //if its invalid the sign-up will be  gray
-                    .cornerRadius(20)
-                    .padding(.horizontal)
-            }
-            .disabled(!areInputsValid()) //this would disable if inputs are invalid
-            .padding(.top, 30)
-            
-                        //the login page
-            HStack{
-                Text("Already have an account?")
-                NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
-                    Text("Login")
-                        .foregroundColor(.blue)
+            Button(action: handlingSignUp){     //Was newly added
+                NavigationLink(destination: SignUpTransitionView()){
+                    Text("Sign up")
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(areInputsValid() ? Color.purple : Color.gray) //if its invalid the sign-up will be  gray
+                        .cornerRadius(20)
+                        .padding(.horizontal)
                 }
-                .underline()
+                .disabled(!areInputsValid()) //this would disable if inputs are invalid
+                .padding(.top, 30)
             }
-            .padding()
+                
+                //the login page
+                HStack{
+                    Text("Already have an account?")
+                    NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
+                        Text("Login")
+                            .foregroundColor(.blue)
+                    }
+                    .underline()
+                }
+                .padding()
+            
+            .navigationTitle("Sign up Page")
         }
-        .navigationTitle("Sign up Page")
     }
+        
+    
+    
        
     //Making sure that all the inputs aren't empty and that
     //password matches confirmpassword
     func areInputsValid() -> Bool {
         return !firstName.isEmpty && !lastName.isEmpty && !email.isEmpty && !password.isEmpty && password == confirmPassword
     }
+    
+    
+    // Field-specific validation        //Was newly added
+        func validateFirstName() {
+            firstNameError = firstName.isEmpty ? "First name cannot be empty." : ""
+        }
+        
+        func validateLastName() {
+            lastNameError = lastName.isEmpty ? "Last name cannot be empty." : ""
+        }
+        
+        func validateEmail() {
+            if email.isEmpty {
+                emailError = "Email cannot be empty."
+            } else if !email.contains("@") {
+                emailError = "Please enter a valid email address."
+            } else {
+                emailError = ""
+            }
+        }
+        
+        func validatePassword() {
+            passwordError = password.isEmpty ? "Password cannot be empty." : ""
+        }
+        
+        func validateConfirmPassword() {
+            if confirmPassword.isEmpty {
+                confirmPasswordError = "Please confirm your password."
+            } else if password != confirmPassword {
+                confirmPasswordError = "Passwords do not match."
+            } else {
+                confirmPasswordError = ""
+            }
+        }
+    //Was newly added
+  
+    
+    func handlingSignUp() {     //Was newly added
+          // Re-validate all fields on sign-up attempt
+          validateFirstName()
+          validateLastName()
+          validateEmail()
+          validatePassword()
+          validateConfirmPassword()
+          
+          if areInputsValid() {
+              print("Sign up success")
+          }
+      }
+    
+    
 }
 
 
