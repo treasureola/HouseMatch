@@ -12,6 +12,7 @@ struct Simple_GUIApp: App {
     var body: some Scene {
         WindowGroup {
            WelcomeView()
+//            MainAppView()
         }
     }
 }

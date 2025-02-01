@@ -12,7 +12,13 @@ import SwiftUI
 
 //This is the front page/Welcome page of the application
 struct WelcomeView: View {
+    
+    @State private var firstName = ""
+    @State private var email = ""
+    @State private var password = ""
+    
     var body: some View {
+        
         NavigationView{
             VStack {   //stacking elements vertically
             
@@ -32,7 +38,7 @@ struct WelcomeView: View {
                 
                 Spacer()
                 //The get Started button
-                NavigationLink(destination: SignUpView()){
+                NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
                     Text("Get Started")
                         .font(.title2)
                         .bold()
@@ -45,8 +51,83 @@ struct WelcomeView: View {
             }
             .padding()
         }
+        
+       
+    
     }
 }
+
+
+
+//the login page's view
+struct LoginScreenView: View {
+//    @State private var username = ""
+    @State private var loginEmail = ""
+    @State private var loginPassword = ""
+    
+//    Text("Welcome back, \(username)!") //this displays
+    
+    let username: String    //passed in from sign-up view
+    let theEmail: String    //passed in from sign-up view
+    let thePassword: String //passed in from sign-up view
+    
+    func areLoginInputsValid() -> Bool {
+        return !loginEmail.isEmpty && !loginPassword.isEmpty && loginEmail == theEmail && loginPassword == thePassword
+    }
+    
+    var body: some View {
+        VStack{
+            Text("Welcome back!")
+                .font(.largeTitle)
+                .bold()
+//            Spacer()
+            
+            Text("Login Here")
+                .font(.title2)
+                .padding(.top, 50)
+            Spacer()
+            
+            TextField("Email", text: $loginEmail)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .padding(.top, 10)
+                .padding(.horizontal)
+            
+            SecureField("Password", text: $loginPassword)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.top, 10)
+                .padding(.horizontal)
+            Spacer()
+            
+            NavigationLink(destination: SignUpTransitionView()){
+                Text("Login Here")
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 50)
+                    .padding(.vertical, 10)
+                    .background(areLoginInputsValid() ? Color.purple : Color.gray) //if its invalid the sign-up will be  gray
+                    .cornerRadius(15)
+            }
+            .disabled(!areLoginInputsValid()) //this would disable if inputs are invalid
+
+            
+        
+            // Side-by-side buttons
+            HStack{
+                Text("Don't have an account?")
+                NavigationLink(destination: SignUpView()){
+                    Text("Sign Up")
+                        .foregroundColor(.blue)
+                }
+            }
+            .navigationTitle("Login")
+        }
+    }
+}
+
+
 
 //This is the view you see when you press "Get Started".
 //The Sign Up page
@@ -146,7 +227,7 @@ struct SignUpView: View {
             
             Spacer()
             Button(action: handlingSignUp){     //Was newly added
-                NavigationLink(destination: SignUpTransitionView()){
+                NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
                     Text("Sign up")
                         .font(.title2)
                         .bold()
@@ -161,15 +242,6 @@ struct SignUpView: View {
                 .padding(.top, 30)
             }
                 
-                //the login page
-                HStack{
-                    Text("Already have an account?")
-                    NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
-                        Text("Login")
-                            .foregroundColor(.blue)
-                    }
-                    .underline()
-                }
                 .padding()
             
             .navigationTitle("Sign up Page")
@@ -238,126 +310,116 @@ struct SignUpView: View {
 }
 
 
-//the login page's view
-struct LoginScreenView: View {
-    @State private var loginEmail = ""
-    @State private var loginPassword = ""
-    
-    let username: String    //passed in from sign-up view
-    let theEmail: String    //passed in from sign-up view
-    let thePassword: String //passed in from sign-up view
-    
-    func areLoginInputsValid() -> Bool {
-        return !loginEmail.isEmpty && !loginPassword.isEmpty &&
-        loginEmail == theEmail && loginPassword == thePassword
-    }
-    
-    var body: some View {
-        VStack{
-            Text("Welcome back, \(username)!") //this displays "Welcome back with the user's first name
-                .font(.largeTitle)
-                .bold()
-            Spacer()
-            
-            TextField("Email", text: $loginEmail)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-                .padding(.top, 10)
-                .padding(.horizontal)
-            
-            SecureField("Password", text: $loginPassword)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.top, 10)
-                .padding(.horizontal)
-            Spacer()
-            // Side-by-side buttons
-            HStack {
-                NavigationLink(destination:PropertiesAndBuildingsSwipe()) {
-                    Text("View Properties")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(areLoginInputsValid() ? Color.blue : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .disabled(!areLoginInputsValid())
-                NavigationLink(destination: FindDreamHome()) {
-                    Text("Make Preferences")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(areLoginInputsValid() ? Color.green : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .disabled(!areLoginInputsValid())
-            }
-            .navigationTitle("Login")
-        }
-    }
-}
+
     
     //the sign-up page's view
     struct SignUpTransitionView: View {
         @State private var successfulTransition = true
         @State private var welcomeTransition = true
         @State private var aboutUs = false
+        @State private var displayTabView = false //to control TabView
         
         var body: some View {
-            VStack {
-                if successfulTransition{
-                    Text("Sign up was successful!")
-                        .transition(.opacity) //the animation
-                }
-                Spacer()
-                
-                if welcomeTransition{
-                    Text("Welcome to HouseMatch!")
-                        .font(.title)
-                        .transition(.opacity) //the animation
-                }
-                
-                if aboutUs{
-                    Text("About Us")
-                    //                    .font(.headline)
-                        .font(.largeTitle)
-                        .bold()
-                        .padding(.top)
-                    //                Spacer()
-                    
-                    Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
-                        .font(.body)
-                        .padding(.horizontal)
-                        .multilineTextAlignment(.center)
-                        .transition(.opacity)
-                    
+            ZStack {
+                VStack {
+                    if successfulTransition{
+                        Text("Sign up was successful!")
+                            .transition(.opacity) //the animation
+                    }
                     Spacer()
-                    //the link to view the properties available
-                    NavigationLink(destination: FindDreamHome()){
-            
-                        Text("Make preferences")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(.top, 20)
+                    
+                    if welcomeTransition{
+                        Text("Welcome to HouseMatch!")
+                            .font(.title)
+                            .transition(.opacity) //the animation
                     }
                     
+//                    if aboutUs{
+//                        Text("About Us")
+//                        //                    .font(.headline)
+//                            .font(.largeTitle)
+//                            .bold()
+//                            .padding(.top)
+//                        //                Spacer()
+//                        
+//                        Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
+//                            .font(.body)
+//                            .padding(.horizontal)
+//                            .multilineTextAlignment(.center)
+//                            .transition(.opacity)
+//                        
+//                        Spacer()
+//                        //the link to make desired preferences on the properties available
+//                        NavigationLink(destination: FindDreamHome()){
+//                            
+//                            Text("Make preferences")
+//                                .font(.headline)
+//                                .foregroundColor(.white)
+//                                .padding()
+//                                .background(Color.blue)
+//                                .cornerRadius(10)
+//                                .padding(.top, 20)
+//                        }
+//                        Spacer()
+//                        //the link to view the properties available
+//                        NavigationLink(destination: PropertiesAndBuildingsSwipe()){
+//                            
+//                            Text("View Properties")
+//                                .font(.headline)
+//                                .foregroundColor(.white)
+//                                .padding()
+//                                .background(Color.purple)
+//                                .cornerRadius(10)
+//                                .padding(.top, 20)
+//                        }
+//                        
+//                
+//                        
+//                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding()
+                .navigationTitle("Welcome")
+                
+                if displayTabView {
+                    VStack{
+                        Spacer()
+                        TabView {
+                            Homepage()
+                                .tabItem {
+                                    Image(systemName: "house.fill")
+                                    Text("Houses")
+                                }
+                            MapsView()
+                                .tabItem {
+                                    Image(systemName: "mappin.and.ellipse")
+                                    Text("Maps")
+                                }
+                            Profile()
+                                .tabItem {
+                                    Image(systemName: "person.2.fill")
+                                    Text("Profile")
+                                }
+                            Preferences()
+                                .tabItem {
+                                    Image(systemName: "slider.horizontal.3")
+                                    Text("Preferences")
+                                }
+                        }
+//                        .frame(height: 20)
+                    }
+                }
             }
-            .padding()
-            .navigationTitle("Welcome")
+                
             .onAppear{
-                // Animation: "Sign Up Successful!" fades away after 2 seconds
+//                 Animation: "Sign Up Successful!" fades away after 2 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     withAnimation {
                         successfulTransition = false
                     }
                 }
                 // Animation: "Welcome to HouseMatch!" fades away after 6 seconds
-                DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     withAnimation {
                         welcomeTransition = false
                     }
@@ -365,7 +427,8 @@ struct LoginScreenView: View {
                 //Animation: this will show the "About Us" right after "Welcome to HouseMatch!" fades away
                 DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                     withAnimation {
-                        aboutUs = true
+//                        aboutUs = true
+                        displayTabView = true
                     }
                 }
                 
@@ -597,7 +660,7 @@ struct LoginScreenView: View {
     
     //a property struct to hold the building data
     //we use hasable becuase we use 'Property struct' as the identifier in the ForEach loop
-struct Property: Hashable{  
+struct Property: Hashable{
         var typeOfBuilding: String
         var imageName: String
         var description: String
