@@ -6,8 +6,6 @@ import JWT
 
 
 
-import Vapor
-
 // Define the routes
 func routes(_ app: Application) throws {
 //    NEED TO ADD THE UTHENTICATION PROTECTION TO THE DIFFERENT ROUTES THAT NEED IT
