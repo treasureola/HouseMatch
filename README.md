@@ -5,13 +5,17 @@
 - Create a basaic login page to integrate then branch off of it 
 - Frontend integrates with database
 - HostBackend on AWS Server 
-- Backend integrates with database
 - backend integrates with machine learning
 - backed interates with frontend
 - Machine learning (Document Journey) 
   - Encode and include details data in the machine lerning model
+- User able to sign up and log in
+- Preferences saved to database
+- Properties can be pulled from API
+- Properties will be stored in database
 ## February Goals
 - Improve machine learning accuracy
+- - Backend integrates with database
 ## March Goals
 - 
 ## April Goals
