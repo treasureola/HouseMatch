@@ -1,7 +1,7 @@
 //New integration part - Frontend !!
 
 //
-//  WelcomeView.swift
+//  ContentView.swift
 //  Simple_GUI
 //
 //  Created by Kweku Awuah on 9/24/24.
@@ -11,7 +11,7 @@
 import SwiftUI
 
 //This is the front page/Welcome page of the application
-struct WelcomeView: View {
+struct ContentView: View {
     
     @State private var firstName = ""
     @State private var email = ""
@@ -67,9 +67,9 @@ struct LoginScreenView: View {
     
 //    Text("Welcome back, \(username)!") //this displays
     
-    let username: String    //passed in from sign-up view
-    let theEmail: String    //passed in from sign-up view
-    let thePassword: String //passed in from sign-up view
+    let username: String    //strings parameters that were passed in at sign-up view
+    let theEmail: String    //strings parameters that were passed in at sign-up view
+    let thePassword: String //strings parameters that were passed in at sign-up view
     
     func areLoginInputsValid() -> Bool {
         return !loginEmail.isEmpty && !loginPassword.isEmpty && loginEmail == theEmail && loginPassword == thePassword
@@ -132,9 +132,14 @@ struct LoginScreenView: View {
 //This is the view you see when you press "Get Started".
 //The Sign Up page
 struct SignUpView: View {
-    @State private var firstName = ""
-    @State private var lastName = ""
-    @State private var email = ""
+//    @State private var firstName = ""
+//    @State private var lastName = ""
+//    @State private var email = ""
+    
+    //3N. To help access the shared 'UserInfo' object
+    @EnvironmentObject var userInfo: UserInfo
+    
+  
     @State private var password = ""
     @State private var confirmPassword = ""
     
@@ -156,11 +161,11 @@ struct SignUpView: View {
             
             Spacer()
             //input for firstname
-            TextField("Firstname", text: $firstName)
+            TextField("Firstname", text: $userInfo.firstName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
-                .onChange(of: firstName) { validateFirstName()}   //Was newly added
+                .onChange(of: userInfo.firstName) { validateFirstName()}   //Was newly added
             
             if !firstNameError.isEmpty {
                             Text(firstNameError)
@@ -169,11 +174,11 @@ struct SignUpView: View {
                         }
             
             //input for lastname
-            TextField("Lastname", text: $lastName)
+            TextField("Lastname", text:  $userInfo.lastName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
-                .onChange(of: lastName) { validateLastName()}    //Was newly added
+                .onChange(of: userInfo.lastName) { validateLastName()}    //Was newly added
             
             if !lastNameError.isEmpty {          //Was newly added
                             Text(lastNameError)
@@ -183,13 +188,13 @@ struct SignUpView: View {
             
             
             //input for email
-            TextField("Email", text: $email)
+            TextField("Email", text: $userInfo.email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
                 .padding(.top, 6)
                 .padding(.horizontal)
-                .onChange(of: email) { validateEmail()}     //Was newly added
+                .onChange(of: userInfo.email) { validateEmail()}     //Was newly added
             
             if !emailError.isEmpty {     //Was newly added
                            Text(emailError)
@@ -204,7 +209,7 @@ struct SignUpView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
-                .onChange(of: password) { validatePassword()}    //Was newly added
+                .onChange(of: password) { validatePassword()}    //if there was a change on the password then execute the func:validatePassword()
             
             if !passwordError.isEmpty {                       //Was newly added
                            Text(passwordError)
@@ -217,7 +222,7 @@ struct SignUpView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 6)
                 .padding(.horizontal)
-                .onChange(of: confirmPassword) { validateConfirmPassword()}     //Was newly added
+                .onChange(of: confirmPassword) { validateConfirmPassword()}     //if there was a change on confirm password, then execute the func:validateConfirmPassword()
             
             if !confirmPasswordError.isEmpty {                //Was newly added
                           Text(confirmPasswordError)
@@ -227,7 +232,7 @@ struct SignUpView: View {
             
             Spacer()
             Button(action: handlingSignUp){     //Was newly added
-                NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)){
+                NavigationLink(destination: LoginScreenView(username:  userInfo.firstName, theEmail: userInfo.email, thePassword: password)){
                     Text("Sign up")
                         .font(.title2)
                         .bold()
@@ -254,23 +259,23 @@ struct SignUpView: View {
     //Making sure that all the inputs aren't empty and that
     //password matches confirmpassword
     func areInputsValid() -> Bool {
-        return !firstName.isEmpty && !lastName.isEmpty && !email.isEmpty && !password.isEmpty && password == confirmPassword
+        return !userInfo.firstName.isEmpty && !userInfo.lastName.isEmpty && !userInfo.email.isEmpty && !password.isEmpty && password == confirmPassword
     }
     
     
     // Field-specific validation        //Was newly added
         func validateFirstName() {
-            firstNameError = firstName.isEmpty ? "First name cannot be empty." : ""
+            firstNameError =  userInfo.firstName.isEmpty ? "First name cannot be empty." : ""
         }
         
         func validateLastName() {
-            lastNameError = lastName.isEmpty ? "Last name cannot be empty." : ""
+            lastNameError =  userInfo.lastName.isEmpty ? "Last name cannot be empty." : ""
         }
         
         func validateEmail() {
-            if email.isEmpty {
+            if userInfo.email.isEmpty {
                 emailError = "Email cannot be empty."
-            } else if !email.contains("@") {
+            } else if !userInfo.email.contains("@") {
                 emailError = "Please enter a valid email address."
             } else {
                 emailError = ""
@@ -311,7 +316,6 @@ struct SignUpView: View {
 
 
 
-    
     //the sign-up page's view
     struct SignUpTransitionView: View {
         @State private var successfulTransition = true
@@ -449,7 +453,7 @@ struct SignUpView: View {
         let Location = ["Washington, D.C.", "New York City", "Los Angeles", "Boston", "Chicago", "Houston", "Philadelphia", "San Francisco", "Denver", "Salt Lake City", "Phoenix", "Atlanta", "Miami", "Los Angeles", "Boston", "Chicago", "Houston", "Philadelphia", "San Francisco", "Denver", "Salt Lake City", "Phoenix", "Atlanta", "Miami"]
         
         let propertyType = ["Single Family Home", "Condo", "Townhouse", "Apartment", "Land", "Multi-Family Home"]
-        
+        //add a drop dowm menu
         let priceRange = ["$500 - $1000" , "$1000 - $1500", "$1500 - $2000", "$2000 - $2500", "$2500 - $3000", "$3000 - $3500", "$3500 - $4000", "$4000 - $4500", "$4500 - $5000"]
        
         //using Array(1..6) = creates an array with integers from 1 to 6
@@ -695,6 +699,6 @@ struct PropertiesAndBuildingsSwipe: View {
         
     
 #Preview {
-    WelcomeView()
+    ContentView()
 }
 
