@@ -1,5 +1,5 @@
 //
-//  UserNames.swift
+//  UserInfo.swift
 //  Simple_GUI
 //
 //  Created by Kweku Awuah on 2/15/25.

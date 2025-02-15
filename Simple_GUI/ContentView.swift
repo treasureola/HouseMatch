@@ -338,48 +338,7 @@ struct SignUpView: View {
                             .transition(.opacity) //the animation
                     }
                     
-//                    if aboutUs{
-//                        Text("About Us")
-//                        //                    .font(.headline)
-//                            .font(.largeTitle)
-//                            .bold()
-//                            .padding(.top)
-//                        //                Spacer()
-//                        
-//                        Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
-//                            .font(.body)
-//                            .padding(.horizontal)
-//                            .multilineTextAlignment(.center)
-//                            .transition(.opacity)
-//                        
-//                        Spacer()
-//                        //the link to make desired preferences on the properties available
-//                        NavigationLink(destination: FindDreamHome()){
-//                            
-//                            Text("Make preferences")
-//                                .font(.headline)
-//                                .foregroundColor(.white)
-//                                .padding()
-//                                .background(Color.blue)
-//                                .cornerRadius(10)
-//                                .padding(.top, 20)
-//                        }
-//                        Spacer()
-//                        //the link to view the properties available
-//                        NavigationLink(destination: PropertiesAndBuildingsSwipe()){
-//                            
-//                            Text("View Properties")
-//                                .font(.headline)
-//                                .foregroundColor(.white)
-//                                .padding()
-//                                .background(Color.purple)
-//                                .cornerRadius(10)
-//                                .padding(.top, 20)
-//                        }
-//                        
-//                
-//                        
-//                    }
+
                     Spacer()
                 }
                 .padding()
@@ -410,7 +369,6 @@ struct SignUpView: View {
                                     Text("Preferences")
                                 }
                         }
-//                        .frame(height: 20)
                     }
                 }
             }
