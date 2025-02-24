@@ -60,20 +60,23 @@ struct WelcomeView: View {
 
 //the login page's view
 struct LoginScreenView: View {
+    @EnvironmentObject var userInfo: UserInfo
+    
     @State private var loginEmail = ""
     @State private var loginPassword = ""
     @State private var errorMessage = ""
-
+    
     let username: String
     let theEmail: String
     let thePassword: String
-
+    
+    
     let db = Firestore.firestore()
-
+    
     func areLoginInputsValid() -> Bool {
         return !loginEmail.isEmpty && !loginPassword.isEmpty
     }
-
+    
     var body: some View {
         VStack {
             Text("Welcome back!")  //this displays "Welcome back with the user's first name
@@ -161,29 +164,32 @@ struct LoginScreenView: View {
             }
             .navigationTitle("Login")
         }
-}
+    }
     
-func handleLogin() {
-    Auth.auth().signIn(withEmail: loginEmail, password: loginPassword) {
-        result, error in
-        if let error = error {
-            errorMessage = "Login failed: \(error.localizedDescription)"
-        } else {
-            //successful
-            let uid = result?.user.uid
-            let userDoc = db.collection("users").document(uid!)
-            userDoc.getDocument { (document, error) in
-                if let document = document, document.exists {
-                    let userData = document.data()
-                } else {
-                    print("User does not exist")
-                    //create front end representation
-                }
+    func handleLogin() {
+        Auth.auth().signIn(withEmail: loginEmail, password: loginPassword) {
+            result, error in
+            if let error = error {
+                errorMessage = "Login failed: \(error.localizedDescription)"
+            } else {
+                //successful
+                let uid = result?.user.uid
+                let userDoc = db.collection("users").document(uid!)
+                userDoc.getDocument { (document, error) in
+                   if let document = document, document.exists, let userData = document.data() {
+                       DispatchQueue.main.async {
+                           userInfo.firstName = userData["first_name"] as? String ?? ""
+                           userInfo.lastName = userData["last_name"] as? String ?? ""
+                           userInfo.email = userData["email"] as? String ?? ""
+                       }
+                   } else {
+                       print("User document does not exist or error fetching data: \(error?.localizedDescription ?? "Unknown error")")
+                   }
+               }
             }
         }
     }
 }
-
 
 
 //This is the view you see when you press "Get Started".
@@ -476,405 +482,405 @@ struct SignUpView: View {
         
 //The view for user/client to make House preferences/choices
 struct FindDreamHome: View {
-@State private var address = "Select Location"
-@State private var property_type = "Select Property Type"
-@State private var price = "Select Price Range"
-@State private var number_Of_Bedrooms = "Select Number of Bedrooms"
-@State private var number_Of_Bathrooms =
-"Select Number of Bathrooms"
-@State private var number_Of_SquareFeet =
-"Select Number of Square Feet"
-
-let locations =
-["Select Location"] + [
-    "Washington, D.C.",
-    "New York City",
-    "Los Angeles",
-    "Boston",
-    "Chicago",
-    "Houston",
-    "Philadelphia",
-    "San Francisco",
-    "Denver",
-    "Salt Lake City",
-    "Phoenix",
-    "Atlanta",
-    "Miami",
-]
-
-let propertyType =
-["Select Property Type"] + [
-    "Single Family Home", "Condo", "Townhouse", "Apartment",
-    "Land", "Multi-Family Home",
-]
-
-let priceRange =
-["Select Price Range"] + [
-    "$500 - $1000", "$1000 - $1500", "$1500 - $2000",
-    "$2000 - $2500", "$2500 - $3000", "$3000 - $3500",
-    "$3500 - $4000", "$4000 - $4500", "$4500 - $5000",
-]
-
-//using Array(1..6) = creates an array with integers from 1 to 6
-//map {"\($0)"} = this maps the integers to its string representation
-let numberOfBedrooms =
-["Select Number of Bedrooms"] + Array(1...6).map { "\($0)" }
-
-let numberOfBathrooms =
-["Select Number of Bathrooms"] + Array(1...6).map { "\($0)" }
-
-let numberOfSquareFeet =
-["Select Number of Square Feet"] + [
-    "500+", "600+", "700+", "800+", "900+", "1000+", "1200+",
-    "1500+", "2000+", "2500+", "3000+", "3500+", "4000+",
-    "5000+", "6000+",
-]
-
-var body: some View {
-    VStack(alignment: .center, spacing: 20) {
-        Text("Personalize Your Dream Home!")
-            .font(.largeTitle)
-            .padding(.bottom, 20)
-        Spacer()
-        
-        //For the location/Address
-        HStack {
-            Text("Location")
-                .padding(.top, 8)
-                .padding(.horizontal)
+    @State private var address = "Select Location"
+    @State private var property_type = "Select Property Type"
+    @State private var price = "Select Price Range"
+    @State private var number_Of_Bedrooms = "Select Number of Bedrooms"
+    @State private var number_Of_Bathrooms =
+    "Select Number of Bathrooms"
+    @State private var number_Of_SquareFeet =
+    "Select Number of Square Feet"
+    
+    let locations =
+    ["Select Location"] + [
+        "Washington, D.C.",
+        "New York City",
+        "Los Angeles",
+        "Boston",
+        "Chicago",
+        "Houston",
+        "Philadelphia",
+        "San Francisco",
+        "Denver",
+        "Salt Lake City",
+        "Phoenix",
+        "Atlanta",
+        "Miami",
+    ]
+    
+    let propertyType =
+    ["Select Property Type"] + [
+        "Single Family Home", "Condo", "Townhouse", "Apartment",
+        "Land", "Multi-Family Home",
+    ]
+    
+    let priceRange =
+    ["Select Price Range"] + [
+        "$500 - $1000", "$1000 - $1500", "$1500 - $2000",
+        "$2000 - $2500", "$2500 - $3000", "$3000 - $3500",
+        "$3500 - $4000", "$4000 - $4500", "$4500 - $5000",
+    ]
+    
+    //using Array(1..6) = creates an array with integers from 1 to 6
+    //map {"\($0)"} = this maps the integers to its string representation
+    let numberOfBedrooms =
+    ["Select Number of Bedrooms"] + Array(1...6).map { "\($0)" }
+    
+    let numberOfBathrooms =
+    ["Select Number of Bathrooms"] + Array(1...6).map { "\($0)" }
+    
+    let numberOfSquareFeet =
+    ["Select Number of Square Feet"] + [
+        "500+", "600+", "700+", "800+", "900+", "1000+", "1200+",
+        "1500+", "2000+", "2500+", "3000+", "3500+", "4000+",
+        "5000+", "6000+",
+    ]
+    
+    var body: some View {
+        VStack(alignment: .center, spacing: 20) {
+            Text("Personalize Your Dream Home!")
+                .font(.largeTitle)
+                .padding(.bottom, 20)
             Spacer()
-            Picker("Location", selection: $address) {
-                ForEach(Array(Set(locations)), id: \.self) {
-                    location in
-                    Text(location)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        //For the property type
-        HStack {
-            Text("Building Type")
-                .padding(.top, 8)
-                .padding(.horizontal)
-            Spacer()
-            Picker("Property Type", selection: $property_type) {
-                ForEach(propertyType, id: \.self) { property in
-                    Text(property)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        //For price range
-        HStack {
-            Text("Price Range")
-                .padding(.top, 7)
-                .padding(.horizontal)
-            Spacer()
-            Picker("Price Range", selection: $price) {
-                ForEach(priceRange, id: \.self) { price in
-                    Text(price)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        //For number of Bedrooms
-        HStack {
-            Text("Number of Bedrooms")
-                .padding(.top, 20)
-                .padding(.horizontal)
-            Spacer()
-            Picker(
-                "Number of Bedrooms", selection: $number_Of_Bedrooms
-            ) {
-                ForEach(numberOfBedrooms, id: \.self) { number in
-                    Text(number)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        HStack {
-            Text("Number of Bathrooms")
-                .padding(.top, 20)
-                .padding(.horizontal)
-            Spacer()
-            Picker(
-                "Number of Bathrooms",
-                selection: $number_Of_Bathrooms
-            ) {
-                ForEach(numberOfBathrooms, id: \.self) { number in
-                    Text(number)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        HStack {
-            Text("Number of SquareFootage")
-                .padding(.top, 20)
-                .padding(.horizontal)
-            Spacer()
-            Picker(
-                "Number of SquareFootage",
-                selection: $number_Of_SquareFeet
-            ) {
-                ForEach(numberOfSquareFeet, id: \.self) { number in
-                    Text(number)
-                    
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(width: 200)
-        }
-        
-        Spacer()
-        
-        //Redirects to the confirmation page
-        //It takes in the user preferences from "FindDreamHome" such as (address, property_type, price,number_Of_Bedrooms,number_Of_Bathrooms, number_Of_SquareFeet)
-        NavigationLink(
-            destination: ConfirmationPage(
-                
-                address: address,
-                propertyType: property_type,
-                price: price,
-                bedrooms: number_Of_Bedrooms,
-                bathrooms: number_Of_Bathrooms,
-                squareFeet: number_Of_SquareFeet
-            )
-        ) {
             
-            Text("Thank you for designing your dream home!")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.top, 5)
-                .background(
-                    arePreferencesValid() ? Color.blue : Color.gray
+            //For the location/Address
+            HStack {
+                Text("Location")
+                    .padding(.top, 8)
+                    .padding(.horizontal)
+                Spacer()
+                Picker("Location", selection: $address) {
+                    ForEach(Array(Set(locations)), id: \.self) {
+                        location in
+                        Text(location)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            //For the property type
+            HStack {
+                Text("Building Type")
+                    .padding(.top, 8)
+                    .padding(.horizontal)
+                Spacer()
+                Picker("Property Type", selection: $property_type) {
+                    ForEach(propertyType, id: \.self) { property in
+                        Text(property)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            //For price range
+            HStack {
+                Text("Price Range")
+                    .padding(.top, 7)
+                    .padding(.horizontal)
+                Spacer()
+                Picker("Price Range", selection: $price) {
+                    ForEach(priceRange, id: \.self) { price in
+                        Text(price)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            //For number of Bedrooms
+            HStack {
+                Text("Number of Bedrooms")
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                Spacer()
+                Picker(
+                    "Number of Bedrooms", selection: $number_Of_Bedrooms
+                ) {
+                    ForEach(numberOfBedrooms, id: \.self) { number in
+                        Text(number)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            HStack {
+                Text("Number of Bathrooms")
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                Spacer()
+                Picker(
+                    "Number of Bathrooms",
+                    selection: $number_Of_Bathrooms
+                ) {
+                    ForEach(numberOfBathrooms, id: \.self) { number in
+                        Text(number)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            HStack {
+                Text("Number of SquareFootage")
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                Spacer()
+                Picker(
+                    "Number of SquareFootage",
+                    selection: $number_Of_SquareFeet
+                ) {
+                    ForEach(numberOfSquareFeet, id: \.self) { number in
+                        Text(number)
+                        
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200)
+            }
+            
+            Spacer()
+            
+            //Redirects to the confirmation page
+            //It takes in the user preferences from "FindDreamHome" such as (address, property_type, price,number_Of_Bedrooms,number_Of_Bathrooms, number_Of_SquareFeet)
+            NavigationLink(
+                destination: ConfirmationPage(
+                    
+                    address: address,
+                    propertyType: property_type,
+                    price: price,
+                    bedrooms: number_Of_Bedrooms,
+                    bathrooms: number_Of_Bathrooms,
+                    squareFeet: number_Of_SquareFeet
                 )
-                .cornerRadius(10)
+            ) {
+                
+                Text("Thank you for designing your dream home!")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.top, 5)
+                    .background(
+                        arePreferencesValid() ? Color.blue : Color.gray
+                    )
+                    .cornerRadius(10)
+            }
+            
+            .disabled(!arePreferencesValid())  //disables the link if arePreferencesValid() is invalid
+            .padding(.top, 20)
+            
+            .padding(.top, 5)
+            .navigationTitle("Dream Home")
         }
-        
-        .disabled(!arePreferencesValid())  //disables the link if arePreferencesValid() is invalid
-        .padding(.top, 20)
-        
-        .padding(.top, 5)
-        .navigationTitle("Dream Home")
+    }
+    //a function to check that all the inputs aren't empty and a selection has been made
+    func arePreferencesValid() -> Bool {
+        return address != "Select Location"
+        && property_type != "Select Property Type"
+        && price != "Select Price Range"
+        && number_Of_Bedrooms != "Select Number of Bedrooms"
+        && number_Of_Bathrooms != "Select Number of Bathrooms"
+        && number_Of_SquareFeet != "Select Number of Square Feet"
     }
 }
-//a function to check that all the inputs aren't empty and a selection has been made
-func arePreferencesValid() -> Bool {
-    return address != "Select Location"
-    && property_type != "Select Property Type"
-    && price != "Select Price Range"
-    && number_Of_Bedrooms != "Select Number of Bedrooms"
-    && number_Of_Bathrooms != "Select Number of Bathrooms"
-    && number_Of_SquareFeet != "Select Number of Square Feet"
-}
-            
             
 //this is the confirmation page after the user/client makes their preferences
 struct ConfirmationPage: View {
-var address: String
-var propertyType: String
-var price: String
-var bedrooms: String
-var bathrooms: String
-var squareFeet: String
-
-let db = Firestore.firestore()
-
-@State private var navigateToProperties = false
-
-var body: some View {
-    VStack(alignment: .center, spacing: 20) {
-        Text("This is a Confirmation of Your Preferences")
-            .font(.largeTitle)
-            .padding(.bottom, 20)
-        
-        Spacer()
-        
-        //This take in the inputs made from the FindDreeamHome Page and displays it on the confirmation page.
-        Text("Location: \(address)")
-        Text("Property Type: \(propertyType)")
-        Text("Price Range: \(price)")
-        Text("Number of Bedrooms: \(bedrooms)")
-        Text("Number of Bathrooms: \(bathrooms)")
-        Text("Square Footage: \(squareFeet)")
-        
-        Spacer()
-        
-        NavigationLink(destination: SwipeablePropertiesView()){
-            Button(action: {
-                savePreferences()
-                fetchPropertiesAndStore()
-            }) {
-                
-                Text("Confirm and Submit")
-                    .font(.headline)
-                    .bold()
-                    .foregroundColor(.white)
-                    .padding(.top, 5)
-                    .background(Color.green)
-                    .cornerRadius(10)
-            }
-        }
-    }
-    .padding(.top, 5)
-    .navigationTitle("Confirmation")
-}
-
-func savePreferences() {
-    guard let userID = Auth.auth().currentUser?.uid else {
-        print("Error: No authenticated user found.")
-        return
-    }
-    let (minPrice, maxPrice) = parsePriceRange(price)
-    let cleanSquareFeet = squareFeet.replacingOccurrences(of: "+", with: "")
-    let userDoc = db.collection("users").document(userID)
-    let preferences: [String: Any] = [
-        "location": address,
-        "propertyType": propertyType,
-        "minPrice": minPrice,
-        "maxPrice": maxPrice,
-        "bedrooms": bedrooms,
-        "bathrooms": bathrooms,
-        "squareFeet": cleanSquareFeet,
-        "timestamp": Timestamp(),
-    ]
-    
-    userDoc.setData(["preferences": preferences], merge: true) {
-        error in
-        if let error = error {
-            print(
-                "Error saving preferences: \(error.localizedDescription)"
-            )
-        } else {
-            print("Preferences saved successfully")
-            navigateToProperties = true
-        }
-    }
-}
-
-func parsePriceRange(_ range: String) -> (Any, Any) {
-    let numbers = range.components(
-        separatedBy: CharacterSet.decimalDigits.inverted
-    )
-        .compactMap { Int($0) }
-    return (numbers[0], numbers[1])
-}
-
-
-func fetchPropertiesAndStore() {
-    guard let userID = Auth.auth().currentUser?.uid else {
-        print("Error: No authenticated user found.")
-        return
-    }
+    var address: String
+    var propertyType: String
+    var price: String
+    var bedrooms: String
+    var bathrooms: String
+    var squareFeet: String
     
     let db = Firestore.firestore()
-    let userDoc = db.collection("users").document(userID)
     
-    userDoc.getDocument { (document, error) in
-        if let error = error {
-            print("Error fetching user preferences: \(error.localizedDescription)")
+    @State private var navigateToProperties = false
+    
+    var body: some View {
+        VStack(alignment: .center, spacing: 20) {
+            Text("This is a Confirmation of Your Preferences")
+                .font(.largeTitle)
+                .padding(.bottom, 20)
+            
+            Spacer()
+            
+            //This take in the inputs made from the FindDreeamHome Page and displays it on the confirmation page.
+            Text("Location: \(address)")
+            Text("Property Type: \(propertyType)")
+            Text("Price Range: \(price)")
+            Text("Number of Bedrooms: \(bedrooms)")
+            Text("Number of Bathrooms: \(bathrooms)")
+            Text("Square Footage: \(squareFeet)")
+            
+            Spacer()
+            
+            NavigationLink(destination: SwipeablePropertiesView()){
+                Button(action: {
+                    savePreferences()
+                    fetchPropertiesAndStore()
+                }) {
+                    
+                    Text("Confirm and Submit")
+                        .font(.headline)
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding(.top, 5)
+                        .background(Color.green)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        .padding(.top, 5)
+        .navigationTitle("Confirmation")
+    }
+    
+    func savePreferences() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("Error: No authenticated user found.")
             return
         }
+        let (minPrice, maxPrice) = parsePriceRange(price)
+        let cleanSquareFeet = squareFeet.replacingOccurrences(of: "+", with: "")
+        let userDoc = db.collection("users").document(userID)
+        let preferences: [String: Any] = [
+            "location": address,
+            "propertyType": propertyType,
+            "minPrice": minPrice,
+            "maxPrice": maxPrice,
+            "bedrooms": bedrooms,
+            "bathrooms": bathrooms,
+            "squareFeet": cleanSquareFeet,
+            "timestamp": Timestamp(),
+        ]
         
-        guard let document = document, document.exists, let userPreferences = document.data()?["preferences"] as? [String: Any] else {
-            print("No preferences found for user.")
-            return
-        }
-        
-        guard let location = userPreferences["location"] as? String,
-              let minPrice = userPreferences["minPrice"] as? Int,
-              let maxPrice = userPreferences["maxPrice"] as? Int,
-              let bedrooms = userPreferences["bedrooms"] as? String,
-              let bathrooms = userPreferences["bathrooms"] as? String else {
-            print("Error: Missing or invalid user preferences.")
-            return
-        }
-        
-        // Format query parameters based on user preferences
-        let formattedLocation = location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? location
-        let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_min=\(minPrice)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&sortBy=best_match"
-        
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("41074491b8msh897384f5dfbdfd4p122b3cjsn3bf3b6b434f6", forHTTPHeaderField: "x-rapidapi-key")
-        request.setValue("realtor-search.p.rapidapi.com", forHTTPHeaderField: "x-rapidapi-host")
-        
-        let session = URLSession.shared
-        let dataTask = session.dataTask(with: request) { (data, response, error) in
+        userDoc.setData(["preferences": preferences], merge: true) {
+            error in
             if let error = error {
-                print("Error fetching properties: \(error.localizedDescription)")
+                print(
+                    "Error saving preferences: \(error.localizedDescription)"
+                )
+            } else {
+                print("Preferences saved successfully")
+                navigateToProperties = true
+            }
+        }
+    }
+    
+    func parsePriceRange(_ range: String) -> (Any, Any) {
+        let numbers = range.components(
+            separatedBy: CharacterSet.decimalDigits.inverted
+        )
+            .compactMap { Int($0) }
+        return (numbers[0], numbers[1])
+    }
+    
+    
+    func fetchPropertiesAndStore() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("Error: No authenticated user found.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userDoc = db.collection("users").document(userID)
+        
+        userDoc.getDocument { (document, error) in
+            if let error = error {
+                print("Error fetching user preferences: \(error.localizedDescription)")
                 return
             }
             
-            guard let data = data else {
-                print("No data received")
+            guard let document = document, document.exists, let userPreferences = document.data()?["preferences"] as? [String: Any] else {
+                print("No preferences found for user.")
                 return
             }
             
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                guard let results = json?["data"] as? [String: Any],
-                      let properties = results["results"] as? [[String: Any]] else {
-                    print("Invalid response format")
+            guard let location = userPreferences["location"] as? String,
+                  let minPrice = userPreferences["minPrice"] as? Int,
+                  let maxPrice = userPreferences["maxPrice"] as? Int,
+                  let bedrooms = userPreferences["bedrooms"] as? String,
+                  let bathrooms = userPreferences["bathrooms"] as? String
+            else {
+                print("Error: Missing or invalid user preferences.")
+                return
+            }
+            
+            // Format query parameters based on user preferences
+            let formattedLocation = location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? location
+            let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_min=\(minPrice)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&sortBy=best_match"
+            
+            guard let url = URL(string: urlString) else {
+                print("Invalid URL")
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("41074491b8msh897384f5dfbdfd4p122b3cjsn3bf3b6b434f6", forHTTPHeaderField: "x-rapidapi-key")
+            request.setValue("realtor-search.p.rapidapi.com", forHTTPHeaderField: "x-rapidapi-host")
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request) { (data, response, error) in
+                if let error = error {
+                    print("Error fetching properties: \(error.localizedDescription)")
                     return
                 }
                 
-                let db = Firestore.firestore()
-                let propertiesCollection = db.collection("properties")
+                guard let data = data else {
+                    print("No data received")
+                    return
+                }
                 
-                for property in properties {
-                    let propertyData: [String: Any] = [
-                        "property_id": property["property_id"] ?? UUID().uuidString,
-                        "listing_id": property["listing_id"] ?? "",
-                        "status": property["status"] ?? "Unknown",
-                        "photo_url": (property["primary_photo"] as? [String: Any])?["href"] ?? "",
-                        "address": (property["location"] as? [String: Any])?["address"] as? [String: Any] ?? [:],
-                        "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
-                        "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
-                        "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
-                        "price_min": property["list_price_min"] ?? 0,
-                        "price_max": property["list_price_max"] ?? 0,
-                        "bedrooms_min": (property["description"] as? [String: Any])?["beds_min"] ?? 0,
-                        "bedrooms_max": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
-                        "bathrooms_min": (property["description"] as? [String: Any])?["baths_min"] ?? 0,
-                        "bathrooms_max": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
-                        "square_feet_min": (property["description"] as? [String: Any])?["sqft_min"] ?? 0,
-                        "square_feet_max": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,
-                        "listing_url": property["href"] ?? ""
-                    ]
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                    guard let results = json?["data"] as? [String: Any],
+                          let properties = results["results"] as? [[String: Any]] else {
+                        print("Invalid response format")
+                        return
+                    }
                     
-                    propertiesCollection.document("\(propertyData["property_id"]!)").setData(propertyData) { error in
-                        if let error = error {
-                            print("Error saving property: \(error.localizedDescription)")
-                        } else {
-                            print("Property saved successfully!")
+                    let db = Firestore.firestore()
+                    let propertiesCollection = db.collection("properties")
+                    
+                    for property in properties {
+                        let propertyData: [String: Any] = [
+                            "property_id": property["property_id"] ?? UUID().uuidString,
+                            "listing_id": property["listing_id"] ?? "",
+                            "status": property["status"] ?? "Unknown",
+                            "photo_url": (property["primary_photo"] as? [String: Any])?["href"] ?? "",
+                            "address": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["line"] ?? "",
+                            "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
+                            "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
+                            "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
+                            "price_min": property["list_price_min"] ?? 0,
+                            "price_max": property["list_price_max"] ?? 0,
+                            "bedrooms": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
+                            "bathrooms": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
+                            "square_feet": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,
+                            "listing_url": property["href"] ?? "",
+                            "amenities": ((property["details"] as? [[String: Any]])?.compactMap { $0["text"] as? [String] }.flatMap { $0 }) ?? [],
+                            "petFriendly": property["pet_policy.cats"] as? Bool == true || property["pet_policy.dogs"] as? Bool == true
+                        ]
+                        
+                        propertiesCollection.document("\(propertyData["property_id"]!)").setData(propertyData) { error in
+                            if let error = error {
+                                print("Error saving property: \(error.localizedDescription)")
+                            } else {
+                                print("Property saved successfully!")
+                            }
                         }
                     }
+                } catch {
+                    print("Error parsing JSON: \(error.localizedDescription)")
                 }
-            } catch {
-                print("Error parsing JSON: \(error.localizedDescription)")
             }
+            
+            dataTask.resume()
         }
-        
-        dataTask.resume()
     }
 }
-
 
 struct ThankYouPage: View {
     var body: some View {
@@ -890,134 +896,10 @@ struct ThankYouPage: View {
     }
 }
 
-struct Property: Identifiable {
-    let id: String
-    let imageUrl: String
-    let address: String
-    let price: Int
-    let bedrooms: Int
-    let bathrooms: Int
-    let listingUrl: String
-}
-
-struct PropertyCard: View {
-    let property: Property
-    var onRemove: (() -> Void)? // Callback when card is swiped
-
-    @State private var offset: CGSize = .zero
-    @State private var color: Color = .white
-
-    var body: some View {
-        ZStack {
-            VStack {
-                if let imageUrl = URL(string: property.imageUrl) {
-                    AsyncImage(url: imageUrl) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    .frame(height: 300)
-                    .cornerRadius(15)
-                }
-                
-                Text(property.address)
-                    .font(.headline)
-                    .padding(.top, 5)
-
-                Text("$\(property.price)")
-                    .font(.title)
-                    .bold()
-
-                HStack {
-                    Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths")
-                        .font(.subheadline)
-                }
-
-                Spacer()
-
-                // Button to view more details
-                Link("View Listing", destination: URL(string: property.listingUrl)!)
-                    .foregroundColor(.blue)
-                    .padding()
-            }
-            .padding()
-            .background(color)
-            .cornerRadius(15)
-            .shadow(radius: 5)
-            .offset(offset)
-            .gesture(
-                DragGesture()
-                    .onChanged { gesture in
-                        self.offset = gesture.translation
-                        self.color = offset.width > 0 ? .green : .red
-                    }
-                    .onEnded { _ in
-                        if abs(offset.width) > 150 {
-                            onRemove?() // Remove the card if swiped far enough
-                        } else {
-                            offset = .zero
-                            color = .white
-                        }
-                    }
-            )
-        }
-    }
-}
-
-class PropertyViewModel: ObservableObject {
-    @Published var properties: [Property] = []
-
-    func fetchProperties() {
-        let db = Firestore.firestore()
-        db.collection("properties").getDocuments { (snapshot, error) in
-            if let error = error {
-                print("Error fetching properties: \(error.localizedDescription)")
-                return
-            }
-
-            DispatchQueue.main.async {
-                self.properties = snapshot?.documents.compactMap { doc -> Property? in
-                    let data = doc.data()
-                    return Property(
-                        id: doc.documentID,
-                        imageUrl: data["photo_url"] as? String ?? "",
-                        address: data["city"] as? String ?? "Unknown City",
-                        price: data["price_min"] as? Int ?? 0,
-                        bedrooms: data["bedrooms_min"] as? Int ?? 0,
-                        bathrooms: data["bathrooms_min"] as? Int ?? 0,
-                        listingUrl: data["listing_url"] as? String ?? ""
-                    )
-                } ?? []
-            }
-        }
-    }
-}
 
 
-struct SwipeablePropertiesView: View {
-    @StateObject private var viewModel = PropertyViewModel()
 
-    var body: some View {
-        ZStack {
-            ForEach(viewModel.properties) { property in
-                PropertyCard(property: property) {
-                    removeProperty(property)
-                }
-                .padding()
-            }
-        }
-        .onAppear {
-            viewModel.fetchProperties() // Fetch properties when view loads
-        }
-    }
-
-    func removeProperty(_ property: Property) {
-        withAnimation {
-            viewModel.properties.removeAll { $0.id == property.id }
-        }
-    }
-}
-                
+             
 //                //a property struct to hold the building data
 //                //we use hasable becuase we use 'Property struct' as the identifier in the ForEach loop
 //                struct Property: Hashable {
@@ -1081,10 +963,4 @@ struct SwipeablePropertiesView: View {
                 #Preview {
                     WelcomeView()
                 }
-                
-            }
-        }
-        
-        
-    }
 

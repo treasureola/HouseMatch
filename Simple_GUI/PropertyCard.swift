@@ -32,24 +32,34 @@ struct PropertyCard: View {
                     .font(.headline)
                     .padding(.top, 5)
 
-                Text("$\(property.price)")
+                Text("$\(property.priceMin) - $\(property.priceMax)")
                     .font(.title)
                     .bold()
+                
+                Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths • \(property.squareFeet) sqft")
+                                    .font(.subheadline)
+                                    .padding(.vertical, 5)
 
-                HStack {
-                    Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths")
+
+                Text("Amenities: \(property.amenities.joined(separator: ", "))")
+                    .font(.footnote)
+                    .padding(.top, 5)
+
+                if property.petFriendly {
+                    Text("🐾 Pet-Friendly")
+                        .foregroundColor(.green)
                         .font(.subheadline)
                 }
 
                 Spacer()
 
                 // Button to view more details
-                Link("View Listing", destination: URL(string: property.listingUrl)!)
+                Link("View Listing", destination: URL(string: "https://www.realtor.com/details/\(property.propertyID)")!)
                     .foregroundColor(.blue)
                     .padding()
             }
             .padding()
-            .background(color.opacity(0.8))
+            .background(color)
             .cornerRadius(15)
             .shadow(radius: 5)
             .offset(offset)

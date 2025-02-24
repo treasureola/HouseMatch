@@ -31,3 +31,4 @@ struct SwipeablePropertiesView: View {
         }
     }
 }
+   
