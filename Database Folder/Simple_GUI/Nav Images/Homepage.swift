@@ -59,18 +59,18 @@ struct Homepage: View {
                     Spacer()
                     
                     
-                    //the link to view the properties available
-                    NavigationLink(destination: SwipeablePropertiesView()){
-                        
-                        Text("View Properties")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.orange)
-                            .cornerRadius(10)
-                            .padding(.top, 20)
-                            .padding(.bottom, 20)
-                    }
+//                    //the link to view the properties available
+//                    NavigationLink(destination: PropertiesAndBuildingsSwipe()){
+//                        
+//                        Text("View Properties")
+//                            .font(.headline)
+//                            .foregroundColor(.white)
+//                            .padding()
+//                            .background(Color.orange)
+//                            .cornerRadius(10)
+//                            .padding(.top, 20)
+//                            .padding(.bottom, 20)
+//                    }
                     
                 }
             }

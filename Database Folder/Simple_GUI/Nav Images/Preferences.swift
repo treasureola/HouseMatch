@@ -28,16 +28,16 @@ struct Preferences: View {
                     .padding(.top, 50)
                 Spacer()
                 
-                NavigationLink(destination: FindDreamHome()){
-                    
-                    Text("Make preferences")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                        .padding(.bottom, 20)
-                }
+//                NavigationLink(destination: FindDreamHome()){
+//                    
+//                    Text("Make preferences")
+//                        .font(.headline)
+//                        .foregroundColor(.white)
+//                        .padding()
+//                        .background(Color.blue)
+//                        .cornerRadius(10)
+//                        .padding(.bottom, 20)
+//                }
             }
            
             

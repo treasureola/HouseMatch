@@ -25,12 +25,18 @@ class PropertyViewModel: ObservableObject {
                     let data = doc.data()
                     return Property(
                         id: doc.documentID,
+                        propertyID: data["property_id"] as? String ?? "",
+                        listingID: data["listing_id"] as? String ?? "",
+                        status: data["status"] as? String ?? "Unknown",
                         imageUrl: data["photo_url"] as? String ?? "",
-                        address: data["city"] as? String ?? "Unknown City",
-                        price: data["price_min"] as? Int ?? 0,
-                        bedrooms: data["bedrooms_min"] as? Int ?? 0,
-                        bathrooms: data["bathrooms_min"] as? Int ?? 0,
-                        listingUrl: data["listing_url"] as? String ?? ""
+                        address: "\(data["city"] as? String ?? ""), \(data["state_code"] as? String ?? "")",
+                        priceMin: data["price_min"] as? Int ?? 0,
+                        priceMax: data["price_max"] as? Int ?? 0,
+                        bedrooms: data["bedrooms_max"] as? Int ?? 0,
+                        bathrooms: data["bathrooms_max"] as? Int ?? 0,
+                        squareFeet: data["square_feet_max"] as? Int ?? 0,
+                        amenities: data["details"] as? [String] ?? [],
+                        petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
                     )
                 } ?? []
             }

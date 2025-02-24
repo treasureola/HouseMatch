@@ -10,10 +10,16 @@ import Foundation
 
 struct Property: Identifiable {
     let id: String
+    let propertyID: String
+    let listingID: String
+    let status: String
     let imageUrl: String
     let address: String
-    let price: Int
+    let priceMin: Int
+    let priceMax: Int
     let bedrooms: Int
     let bathrooms: Int
-    let listingUrl: String
+    let squareFeet: Int
+    let amenities: [String]
+    let petFriendly: Bool
 }
