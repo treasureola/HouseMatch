@@ -809,7 +809,7 @@ struct ConfirmationPage: View {
             
             // Format query parameters based on user preferences
             let formattedLocation = location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? location
-            let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_min=\(minPrice)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&sortBy=best_match"
+            let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_min=\(minPrice)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&resultsPerPage=20&sortBy=best_match"
             
             guard let url = URL(string: urlString) else {
                 print("Invalid URL")
@@ -854,8 +854,7 @@ struct ConfirmationPage: View {
                             "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
                             "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
                             "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
-                            "price_min": property["list_price_min"] ?? 0,
-                            "price_max": property["list_price_max"] ?? 0,
+                            "price": property["list_price_max"] ?? 0,
                             "bedrooms": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
                             "bathrooms": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
                             "square_feet": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,

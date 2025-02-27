@@ -7,6 +7,9 @@
 
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseCore
+import FirebaseFirestore
 
 struct PropertyCard: View {
     let property: Property
@@ -31,9 +34,14 @@ struct PropertyCard: View {
                 Text(property.address)
                     .font(.headline)
                     .padding(.top, 5)
+                
+                Text(property.location)
+                    .font(.headline)
+                    .padding(.top, 5)
 
-                Text("$\(property.priceMin) - $\(property.priceMax)")
+                Text("$\(property.price)")
                     .font(.title)
+                    .padding(.top, 5)
                     .bold()
                 
                 Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths • \(property.squareFeet) sqft")
@@ -41,9 +49,18 @@ struct PropertyCard: View {
                                     .padding(.vertical, 5)
 
 
-                Text("Amenities: \(property.amenities.joined(separator: ", "))")
-                    .font(.footnote)
-                    .padding(.top, 5)
+                VStack(alignment: .leading) {
+                    Text("Amenities:")
+                        .font(.headline)
+                        .padding(.top, 5)
+
+                    ForEach(property.amenities, id: \.self) { amenity in
+                        Text("• \(amenity)")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .padding(.top, 5)
 
                 if property.petFriendly {
                     Text("🐾 Pet-Friendly")
@@ -54,9 +71,12 @@ struct PropertyCard: View {
                 Spacer()
 
                 // Button to view more details
-                Link("View Listing", destination: URL(string: "https://www.realtor.com/details/\(property.propertyID)")!)
-                    .foregroundColor(.blue)
-                    .padding()
+                if let url = URL(string: property.listingURL){
+                    Link("View Listing", destination: url)
+                        .foregroundColor(.blue)
+                        .padding()
+                }
+                
             }
             .padding()
             .background(color)
@@ -71,6 +91,7 @@ struct PropertyCard: View {
                     }
                     .onEnded { _ in
                         if abs(offset.width) > 150 {
+                            saveLikedProperty(property)
                             onRemove?() // Remove the card if swiped far enough
                         } else {
                             offset = .zero
@@ -78,6 +99,34 @@ struct PropertyCard: View {
                         }
                     }
             )
+        }
+    }
+    
+    func saveLikedProperty(_ property: Property){
+        guard let userID = Auth.auth().currentUser?.uid else{
+            print("User not authenticated")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let likedHomeData: [String: Any] = [
+            "propertyID": property.id,
+            "address": property.address,
+            "price": property.price,
+            "bedrooms": property.bedrooms,
+            "bathrooms": property.bathrooms,
+            "imageUrl": property.imageUrl,
+            "listingID": property.listingID,
+            "listingURL": property.listingURL,
+            "timestamp": Timestamp()
+        ]
+        
+        db.collection("users").document(userID).collection("likedHomes").document(property.id).setData(likedHomeData){ error in
+            if let error = error {
+                print("Error saving liked home: \(error.localizedDescription)")
+            } else {
+                print("Home liked and saved successfully!")
+            }
         }
     }
 }

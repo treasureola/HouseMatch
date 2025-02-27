@@ -12,11 +12,12 @@ struct Property: Identifiable {
     let id: String
     let propertyID: String
     let listingID: String
+    let listingURL: String
     let status: String
     let imageUrl: String
     let address: String
-    let priceMin: Int
-    let priceMax: Int
+    let location: String
+    let price: Int
     let bedrooms: Int
     let bathrooms: Int
     let squareFeet: Int
