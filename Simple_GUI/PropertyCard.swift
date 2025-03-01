@@ -158,6 +158,33 @@ struct PropertyCard: View {
                 print("Error saving liked home: \(error.localizedDescription)")
             } else {
                 print("Home liked and saved successfully!")
+                updateImplicitPreferences(for: userID, with: property)
+            }
+        }
+    }
+    
+    func updateImplicitPreferences(for userID: String, with property: Property) {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userID)
+
+        userRef.getDocument { document, error in
+            if let document = document, document.exists {
+                var currentPreferences = document.data()?["implicit_preferences"] as? [String: Double] ?? [:]
+                
+                for amenity in property.amenities {
+                    currentPreferences[amenity] = (currentPreferences[amenity] ?? 0) + 1.0
+                }
+                
+                // Update in Firestore
+                userRef.updateData(["implicit_preferences": currentPreferences]) { error in
+                    if let error = error {
+                        print("Error updating preferences: \(error.localizedDescription)")
+                    } else {
+                        print("User's implicit preferences updated successfully!")
+                    }
+                }
+            } else {
+                print("User document does not exist")
             }
         }
     }

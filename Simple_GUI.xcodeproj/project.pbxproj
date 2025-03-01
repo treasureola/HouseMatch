@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D270C1322D729CA400F54093 /* housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json in Resources */ = {isa = PBXBuildFile; fileRef = D270C1312D729CA400F54093 /* housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json */; };
 		D293E3FD2D4468F30000EAC2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D293E3FC2D4468F30000EAC2 /* GoogleService-Info.plist */; };
 		D2A7D6072D42B07A00D9DC51 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D2A7D6062D42B07A00D9DC51 /* FirebaseAuth */; };
 		D2A7D6092D42B07A00D9DC51 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D2A7D6082D42B07A00D9DC51 /* FirebaseCore */; };
@@ -16,6 +17,7 @@
 
 /* Begin PBXFileReference section */
 		9CB7699D2CA39E0700CADA29 /* Simple_GUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Simple_GUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D270C1312D729CA400F54093 /* housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json"; sourceTree = "<group>"; };
 		D293E3FC2D4468F30000EAC2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,6 +47,7 @@
 		9CB769942CA39E0700CADA29 = {
 			isa = PBXGroup;
 			children = (
+				D270C1312D729CA400F54093 /* housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json */,
 				D293E3FC2D4468F30000EAC2 /* GoogleService-Info.plist */,
 				9CB7699F2CA39E0700CADA29 /* Simple_GUI */,
 				9CB7699E2CA39E0700CADA29 /* Products */,
@@ -130,6 +133,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D270C1322D729CA400F54093 /* housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json in Resources */,
 				D293E3FD2D4468F30000EAC2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
