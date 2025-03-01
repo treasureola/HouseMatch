@@ -6,15 +6,25 @@
 //
 
 
-import SwiftUI
+import FirebaseAuth
+import FirebaseCore
 import FirebaseFirestore
+import SwiftUI
 
 class PropertyViewModel: ObservableObject {
     @Published var properties: [Property] = []
 
     func fetchProperties() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("No authenticated user found.")
+            return
+        }
+        
         let db = Firestore.firestore()
-        db.collection("properties").getDocuments { (snapshot, error) in
+        db.collection("properties")
+            .whereField("assignedUserID", isEqualTo: userID)
+//            .whereField("viewed", isEqualTo: false)
+            .getDocuments { (snapshot, error) in
             if let error = error {
                 print("Error fetching properties: \(error.localizedDescription)")
                 return
@@ -23,6 +33,9 @@ class PropertyViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.properties = snapshot?.documents.compactMap { doc -> Property? in
                     let data = doc.data()
+                    let amenitiesArray = data["amenities"] as? NSArray ?? []
+                    let amenities = amenitiesArray.compactMap { $0 as? String } // Convert to Swift array
+//                    print("Raw Firestore Data: \(data)")
                     return Property(
                         id: doc.documentID,
                         propertyID: data["property_id"] as? String ?? "",
@@ -36,7 +49,7 @@ class PropertyViewModel: ObservableObject {
                         bedrooms: data["bedrooms"] as? Int ?? 0,
                         bathrooms: data["bathrooms"] as? Int ?? 0,
                         squareFeet: data["square_feet"] as? Int ?? 0,
-                        amenities: data["details"] as? [String] ?? [],
+                        amenities: amenities,
                         petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
                     )
                 } ?? []
