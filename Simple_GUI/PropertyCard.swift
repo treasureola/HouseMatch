@@ -20,65 +20,80 @@ struct PropertyCard: View {
 
     var body: some View {
         ZStack {
-            VStack {
-                if let imageUrl = URL(string: property.imageUrl) {
-                    AsyncImage(url: imageUrl) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+            color.edgesIgnoringSafeArea(.all)
+            
+            ScrollView{
+                VStack {
+                    if let imageUrl = URL(string: property.imageUrl) {
+                        AsyncImage(url: imageUrl) { image in
+                            image.resizable()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .frame(height: 300)
+                        .cornerRadius(15)
+                        .clipped()
                     }
-                    .frame(height: 300)
-                    .cornerRadius(15)
-                }
-                
-                Text(property.address)
-                    .font(.headline)
-                    .padding(.top, 5)
-                
-                Text(property.location)
-                    .font(.headline)
-                    .padding(.top, 5)
-
-                Text("$\(property.price)")
-                    .font(.title)
-                    .padding(.top, 5)
-                    .bold()
-                
-                Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths • \(property.squareFeet) sqft")
-                                    .font(.subheadline)
-                                    .padding(.vertical, 5)
-
-
-                VStack(alignment: .leading) {
-                    Text("Amenities:")
+                    
+                    Text(property.address)
+                        .font(.title)
+                        .bold()
+                        .padding(.top, 5)
+                    
+                    Text(property.location)
                         .font(.headline)
                         .padding(.top, 5)
-
-                    ForEach(property.amenities, id: \.self) { amenity in
-                        Text("• \(amenity)")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding(.top, 5)
-
-                if property.petFriendly {
-                    Text("🐾 Pet-Friendly")
-                        .foregroundColor(.green)
+                    
+                    Text("$\(property.price)")
+                        .font(.title)
+                        .padding(.top, 5)
+                        .bold()
+                    
+                    Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths • \(property.squareFeet) sqft")
                         .font(.subheadline)
+                        .padding(.vertical, 5)
+                    
+                    Divider().padding(.vertical, 5)
+                    
+                    VStack(alignment: .leading) {
+                        Text("Amenities:")
+                            .font(.headline)
+                            .padding(.top, 5)
+                        
+                        if property.amenities.isEmpty {
+                            Text("No amenities listed")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(property.amenities, id: \.self) { amenity in
+                                Text("• \(amenity)")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .padding(.top, 5)
+                    
+                    if property.petFriendly {
+                        Text("🐾 Pet-Friendly")
+                            .foregroundColor(.green)
+                            .font(.subheadline)
+                    }
+                    
+                    Spacer()
+                    
+                    // Button to view more details
+                    if let url = URL(string: property.listingURL){
+                        Link("View Listing", destination: url)
+                            .foregroundColor(.blue)
+                            .padding()
+                    }
+                    
                 }
-
-                Spacer()
-
-                // Button to view more details
-                if let url = URL(string: property.listingURL){
-                    Link("View Listing", destination: url)
-                        .foregroundColor(.blue)
-                        .padding()
-                }
-                
+                .padding()
+                .frame(maxWidth: .infinity)
             }
-            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(color)
             .cornerRadius(15)
             .shadow(radius: 5)
@@ -91,14 +106,31 @@ struct PropertyCard: View {
                     }
                     .onEnded { _ in
                         if abs(offset.width) > 150 {
+                            markPropertyAsViewed(property)
                             saveLikedProperty(property)
                             onRemove?() // Remove the card if swiped far enough
                         } else {
-                            offset = .zero
-                            color = .white
+                            withAnimation {
+                                offset = .zero
+                                color = .white
+                            }
                         }
                     }
             )
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    func markPropertyAsViewed(_ property: Property) {
+        let db = Firestore.firestore()
+        let propertyRef = db.collection("properties").document(property.id)
+
+        propertyRef.updateData(["viewed": true]) { error in
+            if let error = error {
+                print("Error updating viewed status: \(error.localizedDescription)")
+            } else {
+                print("Property marked as viewed in Firestore: \(property.id)")
+            }
         }
     }
     
