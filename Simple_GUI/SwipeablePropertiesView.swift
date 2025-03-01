@@ -6,6 +6,7 @@
 //
 
 
+import Foundation
 import SwiftUI
 import FirebaseAuth
 import FirebaseCore
@@ -17,9 +18,12 @@ struct SwipeablePropertiesView: View {
     var body: some View {
         ZStack {
             if viewModel.properties.isEmpty {
-                Text("No properties available")
+                Text("Loading properties...")
                     .font(.headline)
                     .padding()
+                    .onAppear {
+                        fetchRecommendationsAndProperties()
+                    }
             } else {
                 ForEach(viewModel.properties) { property in
                     PropertyCard(property: property) {
@@ -30,10 +34,6 @@ struct SwipeablePropertiesView: View {
                 }
             }
         }
-        .onAppear {
-            print("📡 Fetching properties on appear...")
-            viewModel.fetchProperties() // Fetch properties when view loads
-        }
     }
 
     func removeProperty(_ property: Property) {
@@ -42,5 +42,37 @@ struct SwipeablePropertiesView: View {
         }
     }
     
+    func fetchRecommendationsAndProperties() {
+        guard let user = Auth.auth().currentUser else {
+            print("User not logged in")
+            return
+        }
+        
+        user.getIDToken { idToken, error in
+            guard let idToken = idToken, error == nil else {
+                print("Failed to get ID token: \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+            
+            // Make API call to the backend to update recommendations
+            let url = URL(string: "PUT IN THE ACTUAL URL")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try? JSONEncoder().encode(["id_token": idToken])
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error calling API: \(error)")
+                    return
+                }
+                
+                // Fetch updated properties after recommendations are stored
+                DispatchQueue.main.async {
+                    viewModel.fetchProperties()
+                }
+            }.resume()
+        }
+    }
 }
    

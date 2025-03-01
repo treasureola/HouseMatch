@@ -23,7 +23,8 @@ class PropertyViewModel: ObservableObject {
         let db = Firestore.firestore()
         db.collection("properties")
             .whereField("assignedUserID", isEqualTo: userID)
-//            .whereField("viewed", isEqualTo: false)
+            .whereField("viewed", isEqualTo: false)
+            .order(by: "recommendation_score", descending: true)
             .getDocuments { (snapshot, error) in
             if let error = error {
                 print("Error fetching properties: \(error.localizedDescription)")
@@ -56,4 +57,6 @@ class PropertyViewModel: ObservableObject {
             }
         }
     }
+    
+    
 }
