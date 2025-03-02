@@ -118,7 +118,6 @@ struct Profile: View {
             .padding(.horizontal)
          
 
-    
             NavigationLink(destination: LoginScreenView(username: "", theEmail: "", thePassword: "")){
                 Text("Log Out")
                     .foregroundColor(.red)
@@ -132,6 +131,6 @@ struct Profile: View {
 
 #Preview {
     Profile()
-//        .environmentObject(UserInfo())
+        .environmentObject(UserInfo())
 }
 

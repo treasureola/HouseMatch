@@ -11,7 +11,7 @@ struct Preferences: View {
     var body: some View {
         ZStack{
             
-            //Orange background gradient
+            //Blueish-green background gradient
             //with the top color as: blue
             //bottom color as: green
             LinearGradient(gradient: Gradient(colors: [Color.blue, Color.green]),

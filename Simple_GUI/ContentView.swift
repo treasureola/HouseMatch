@@ -128,13 +128,9 @@ struct LoginScreenView: View {
 }
 
 
-
 //This is the view you see when you press "Get Started".
 //The Sign Up page
 struct SignUpView: View {
-//    @State private var firstName = ""
-//    @State private var lastName = ""
-//    @State private var email = ""
     
     //3N. To help access the shared 'UserInfo' object
     @EnvironmentObject var userInfo: UserInfo
