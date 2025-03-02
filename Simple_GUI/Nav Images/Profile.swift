@@ -15,6 +15,9 @@ struct Profile: View {
     var body: some View {
         ScrollView{
             VStack(spacing: 20){
+                
+                Text("Profile Page:")
+                    .font(.headline)
                 //1. For our profile heading
                 ZStack{ //used ZStack for the layering purpose
                     Color.purple
@@ -36,8 +39,6 @@ struct Profile: View {
                                 .font(.title)
                                 .bold()
                                 .foregroundColor(.white)
-                            
-                            
                         }
                     }
                 }
@@ -78,7 +79,6 @@ struct Profile: View {
                 HStack{
                     Image("singleFamily_House")
                         .resizable()
-//                        .scaledToFit()
                         .frame(width: 100, height: 100)
                     VStack(alignment: .leading){
                         Text("Single Family Home")
@@ -96,7 +96,6 @@ struct Profile: View {
                         .frame(width: 100, height: 100)
                     VStack(alignment: .leading){
                         Text("Townhouse")
-                        
                     }
                     .foregroundColor(.orange)
                     Spacer()
@@ -110,18 +109,15 @@ struct Profile: View {
                         .frame(width: 100, height: 100)
                     VStack(alignment: .leading){
                         Text("Condo")
-                        
                     }
                     .foregroundColor(.orange)
                     Spacer()
                 }
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6)))
-              
             }
             .padding(.horizontal)
          
-           
-            
+
     
             NavigationLink(destination: LoginScreenView(username: "", theEmail: "", thePassword: "")){
                 Text("Log Out")
@@ -129,12 +125,8 @@ struct Profile: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 20).stroke(Color.red))
-                
             }
         }
-        
-
-        
     }
 }
 
