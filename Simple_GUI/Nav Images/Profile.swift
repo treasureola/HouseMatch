@@ -118,7 +118,6 @@ struct Profile: View {
             .padding(.horizontal)
          
 
-    
             NavigationLink(destination: LoginScreenView(username: "", theEmail: "", thePassword: "")){
                 Text("Log Out")
                     .foregroundColor(.red)
