@@ -131,6 +131,6 @@ struct Profile: View {
 
 #Preview {
     Profile()
-        .environmentObject(UserInfo())
+        //.environmentObject(UserInfo())
 }
 
