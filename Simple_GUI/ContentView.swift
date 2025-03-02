@@ -16,7 +16,7 @@ struct ContentView: View {
     @State private var firstName = ""
     @State private var email = ""
     @State private var password = ""
-    
+        
     var body: some View {
         
         NavigationView{
@@ -352,11 +352,6 @@ struct SignUpView: View {
                                 .tabItem {
                                     Image(systemName: "house.fill")
                                     Text("Houses")
-                                }
-                            MapsView()
-                                .tabItem {
-                                    Image(systemName: "mappin.and.ellipse")
-                                    Text("Maps")
                                 }
                             Profile()
                                 .tabItem {

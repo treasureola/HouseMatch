@@ -14,31 +14,6 @@ struct Homepage: View {
 //                .edgesIgnoringSafeArea(.all)
             VStack{
                 VStack{
-                    Text("About Us")
-                        .font(.largeTitle)
-                        .bold()
-                        .foregroundColor(.black)
-                        .padding(.top, 40)
-                    
-                    
-                    
-    
-                    Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
-                        .font(.body)
-        
-                        .padding(.horizontal)
-                        .multilineTextAlignment(.center)
-                        .transition(.opacity)
-                        .padding(.top, 40)
-
-//                    
-                    Spacer()
-//
-
-//                        Image(systemName: "house.fill")
-//                            .foregroundColor(.white)
-//                            .font(.system(size: 90))
-            
                     
                     Image(.houseA)  //HouseMatch logo
                         .resizable()
@@ -46,7 +21,25 @@ struct Homepage: View {
                         .cornerRadius(50)
                         .imageScale(.large)
                         .foregroundStyle(.blue)
+                        .padding(.top, 50)
                     
+                    Text("About Us")
+                        .font(.largeTitle)
+                        .bold()
+                        .foregroundColor(.black)
+                        .padding(.top, 20)
+    
+                    Text("We are an ML-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
+                        .font(.body)
+                        .fontWeight(.medium)
+        
+                        .padding(.horizontal)
+                        .multilineTextAlignment(.center)
+                        .transition(.opacity)
+                        .padding(.top, 2)
+                   
+                    Spacer()
+ 
                     
                     Spacer()
                     
