@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity  
 import pandas as pd
 
-# __________INTEGRATION 2 _________ (LOAD DATA FROM DB)
+# __________INTEGRATION 3 _________ (LOAD DATA FROM DB)
 # Load categorized home data
 with open("categorized_Data.json", "r") as file:
     home_data = json.load(file)
@@ -103,5 +103,5 @@ avg_pref_similarity, avg_liked_similarity = evaluate_model(recommended_houses, K
 print(f"\nEvaluation Results:")
 print(f"Average Preference Similarity of Top 5 Recommendations: {avg_pref_similarity:.4f}")
 print(f"Average Liked House Similarity of Top 5 Recommendations: {avg_liked_similarity:.4f}")
-# __________INTEGRATION 3 _________ (LOAD DATA FROM DB)
+# __________INTEGRATION 4 _________ (LOAD DATA FROM DB)
 # SAVE RECOMMENDED HOUSES TO DB
