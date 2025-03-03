@@ -5,6 +5,9 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity  
 import pandas as pd  
 
+# __________INTEGRATION 1 _________ (LOAD DATA FROM DB)
+# Load categorized home dattails
+
 # Function to recursively convert dictionary keys to strings
 def convert_keys_to_string(data):
     if isinstance(data, dict):  # If the data is a dictionary
@@ -98,7 +101,7 @@ try:
 except IOError: 
     print("Error writing to categorized_Data.json")  # Print an error message.
 
-# __________INTEGRATION 1 _________
+# __________INTEGRATION 2 _________
 # SAVE CATEGORIZED DATA TO DB
 
 # Print Sample Results
