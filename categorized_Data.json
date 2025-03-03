@@ -29,7 +29,7 @@
             "Fishing Lake",
             "Stainless Steel Appliances in Select Homes"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Park",
             "Dogs Allowed",
             "Cats Allowed"
@@ -93,7 +93,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Park",
             "Pet Washing Station",
             "Pet Care Services",
@@ -127,7 +127,7 @@
             "Hospitality Suite Available to Rent",
             "In the Historic Residential Neighborhood of Shaw"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -146,7 +146,7 @@
             "Living rooms with soaring 9ft 6in ceilings",
             "Complimentary WiFi in amenity spaces"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly with pet spa",
             "Dogs Allowed",
             "Cats Allowed"
@@ -172,7 +172,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -202,7 +202,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -234,7 +234,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -285,7 +285,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -341,7 +341,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -363,7 +363,7 @@
             "Upgraded Apartments ",
             "Rent controlled"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -384,7 +384,7 @@
             "Off Street",
             "Efficient Appliances"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -418,7 +418,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -431,7 +431,7 @@
             "Picnic Area",
             "Parking Available"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -496,7 +496,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -520,7 +520,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -544,7 +544,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -602,7 +602,7 @@
             "Package Receiving",
             "Access-A"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -644,14 +644,14 @@
             "Gate",
             "Gates access"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet friendly",
             "Dogs Allowed",
             "Cats Allowed"
         ]
     },
     "9091701101": {
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -696,7 +696,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -711,7 +711,7 @@
             "Laundry",
             "Heating: Electric"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Park",
             "Dogs Allowed",
             "Cats Allowed"
@@ -745,7 +745,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -764,7 +764,7 @@
             "Fully Equipped Kitchens",
             "Resident Activities"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -794,7 +794,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -815,7 +815,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pets Allowed",
             "Pet Washing Station",
             "Dogs Allowed",
@@ -841,7 +841,7 @@
             "Energy-efficient stainless-steel appliances",
             "Cabinets in various shades and finishes"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -873,7 +873,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -898,7 +898,7 @@
             "Quartz Countertops",
             "Co-Working Space"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-Friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -936,7 +936,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -960,7 +960,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -973,7 +973,7 @@
         "Amenities": [
             "Elevator"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -998,7 +998,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1027,7 +1027,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1056,7 +1056,7 @@
             "High-speed Internet Ready",
             "On-Site Maintenance"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1076,7 +1076,7 @@
         "Amenities": [
             "Off Street"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -1100,7 +1100,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -1147,7 +1147,7 @@
             "TV Lounge",
             "Barbecue Area"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1175,7 +1175,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1220,7 +1220,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1242,7 +1242,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1259,7 +1259,7 @@
             "Executive conference center",
             "High-speed Internet Ready"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly community",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1302,7 +1302,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1315,7 +1315,7 @@
             "On-Site Management",
             "On-Site Maintenance"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -1324,7 +1324,7 @@
             "Smoke Free",
             "Garage Detached"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1376,7 +1376,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1429,6 +1429,7 @@
             "Tennis Court",
             "Breakfast Nook",
             "Quiet Community in Wooded Setting",
+            "Plush Wall-To-Wall Carpeting",
             "Custom Finishes Available",
             "Fire Pit",
             "High-speed Internet Ready"
@@ -1436,8 +1437,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
-            "Plush Wall-To-Wall Carpeting",
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1480,7 +1480,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "No Breed Restrictions",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1506,7 +1506,7 @@
             "HardwoodFloor",
             "On-Site Maintenance"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "PetsAllowed"
         ]
     },
@@ -1535,7 +1535,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1579,7 +1579,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1606,7 +1606,7 @@
             "Off Street",
             "View Type: Park"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1631,7 +1631,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1673,7 +1673,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed"
         ]
     },
@@ -1705,7 +1705,7 @@
             "Exposed Spiral Ductwork",
             "Units Above the Podium Level are marked by 9-8 Ft."
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Park",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1752,7 +1752,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1781,7 +1781,7 @@
             "Matte Black Fixtures and Bath Features",
             "Private Work Rooms"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1805,6 +1805,7 @@
             "Tennis Court",
             "Breakfast Nook",
             "Quiet Community in Wooded Setting",
+            "Plush Wall-To-Wall Carpeting",
             "Generously Sized Floor Plans",
             "On-Site Management",
             "On-Site Maintenance"
@@ -1812,8 +1813,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
-            "Plush Wall-To-Wall Carpeting",
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1842,7 +1842,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1876,7 +1876,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -1909,7 +1909,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1934,7 +1934,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -1957,7 +1957,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -1984,7 +1984,7 @@
             "Open Kitchen ",
             "On-Site Management"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet-friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -2003,7 +2003,7 @@
         "Amenities": [
             "Elevator"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -2024,7 +2024,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -2049,12 +2049,12 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
     "6734077919": {
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2085,7 +2085,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2105,7 +2105,7 @@
             "Deck",
             "On-Site Maintenance"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -2140,7 +2140,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet friendly",
             "Dogs Allowed",
             "Cats Allowed"
@@ -2169,7 +2169,7 @@
             "Porch/Patio",
             "Barn Doors"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed"
         ]
     },
@@ -2216,7 +2216,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2250,7 +2250,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2280,7 +2280,7 @@
             "Maker's Space",
             "Game Room"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -2311,7 +2311,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2337,7 +2337,7 @@
             "UPDATED BATHROOMS ",
             "CONTEMPORARY FLOOR PLANS"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Cats Allowed"
         ]
     },
@@ -2359,7 +2359,7 @@
         "Security": [
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2383,7 +2383,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2404,7 +2404,7 @@
             "TV Lounge",
             "Residential Storage Units"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Pet Washing Station",
             "Dogs Allowed",
             "Cats Allowed"
@@ -2439,7 +2439,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2471,7 +2471,7 @@
         "Security": [
             "Package Receiving"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2488,7 +2488,7 @@
             "RESERVED PARKING",
             "ART DECO BATHROOMS"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2519,7 +2519,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
@@ -2564,7 +2564,7 @@
             "Package Receiving",
             "Gate"
         ],
-        "Pet-Friendly": [
+        "Pet_Friendly": [
             "Dogs Allowed",
             "Cats Allowed"
         ]
