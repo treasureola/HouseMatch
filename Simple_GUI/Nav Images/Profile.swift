@@ -132,8 +132,8 @@ struct Profile: View {
             }
 
             DispatchQueue.main.async {
-                userInfo.firstName = data["firstName"] as? String ?? "Unknown"
-                userInfo.lastName = data["lastName"] as? String ?? "User"
+                userInfo.firstName = data["first_name"] as? String ?? "Unknown"
+                userInfo.lastName = data["last_name"] as? String ?? "User"
                 userInfo.email = data["email"] as? String ?? "No Email"
             }
         }

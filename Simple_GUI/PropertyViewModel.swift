@@ -21,39 +21,56 @@ class PropertyViewModel: ObservableObject {
         }
         
         let db = Firestore.firestore()
-        db.collection("properties")
-            .whereField("assignedUserID", isEqualTo: userID)
-//            .whereField("viewed", isEqualTo: false)
-            .getDocuments { (snapshot, error) in
-            if let error = error {
-                print("Error fetching properties: \(error.localizedDescription)")
-                return
-            }
+        
+        db.collection("users").document(userID)
+            .getDocument{ (document, error) in
+                if let error = error {
+                    print("Error fetching user preferences: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let document = document, document.exists,
+                      let userPreferences = document.data()?["preferences"] as? [String: Any],
+                      let location = userPreferences["location"] as? String else {
+                    print("No preferences found for user.")
+                    return
+                }
+                
+                db.collection("properties")
+                    .whereField("assignedUserID", isEqualTo: userID)
+                    .whereField("viewed", isEqualTo: false)
+                    .whereField("city", isEqualTo: location)
+                    .limit(to: 25)
+                    .getDocuments { (snapshot, error) in
+                    if let error = error {
+                        print("Error fetching properties: \(error.localizedDescription)")
+                        return
+                    }
 
-            DispatchQueue.main.async {
-                self.properties = snapshot?.documents.compactMap { doc -> Property? in
-                    let data = doc.data()
-                    let amenitiesArray = data["amenities"] as? NSArray ?? []
-                    let amenities = amenitiesArray.compactMap { $0 as? String } // Convert to Swift array
-//                    print("Raw Firestore Data: \(data)")
-                    return Property(
-                        id: doc.documentID,
-                        propertyID: data["property_id"] as? String ?? "",
-                        listingID: data["listing_id"] as? String ?? "",
-                        listingURL: data["listing_url"] as? String ?? "",
-                        status: data["status"] as? String ?? "Unknown",
-                        imageUrl: data["photo_url"] as? String ?? "",
-                        address: data["address"] as? String ?? "",
-                        location: "\(data["city"] as? String ?? ""), \(data["state_code"] as? String ?? "")",
-                        price: data["price"] as? Int ?? 0,
-                        bedrooms: data["bedrooms"] as? Int ?? 0,
-                        bathrooms: data["bathrooms"] as? Int ?? 0,
-                        squareFeet: data["square_feet"] as? Int ?? 0,
-                        amenities: amenities,
-                        petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
-                    )
-                } ?? []
+                    DispatchQueue.main.async {
+                        self.properties = snapshot?.documents.compactMap { doc -> Property? in
+                            let data = doc.data()
+                            let amenitiesArray = data["amenities"] as? NSArray ?? []
+                            let amenities = amenitiesArray.compactMap { $0 as? String } // Convert to Swift array
+                            return Property(
+                                id: doc.documentID,
+                                propertyID: data["property_id"] as? String ?? "",
+                                listingID: data["listing_id"] as? String ?? "",
+                                listingURL: data["listing_url"] as? String ?? "",
+                                status: data["status"] as? String ?? "Unknown",
+                                imageUrl: data["photo_url"] as? String ?? "",
+                                address: data["address"] as? String ?? "",
+                                location: "\(data["city"] as? String ?? ""), \(data["state_code"] as? String ?? "")",
+                                price: data["price"] as? Int ?? 0,
+                                bedrooms: data["bedrooms"] as? Int ?? 0,
+                                bathrooms: data["bathrooms"] as? Int ?? 0,
+                                squareFeet: data["square_feet"] as? Int ?? 0,
+                                amenities: amenities,
+                                petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
+                            )
+                        } ?? []
+                    }
+                }
             }
-        }
     }
 }

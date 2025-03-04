@@ -31,7 +31,7 @@ struct SwipeablePropertiesView: View {
             }
         }
         .onAppear {
-            print("📡 Fetching properties on appear...")
+            print("Fetching properties on appear...")
             viewModel.fetchProperties() // Fetch properties when view loads
         }
     }
