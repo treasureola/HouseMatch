@@ -1,50 +1,48 @@
 // swift-tools-version:6.0
 import PackageDescription
 
+//firebase-admin-swift does NOT exist. The correct Firebase Admin SDK for Swift is not publicly available yet. As an alternative, you can:
+//
+//Use Firebase REST API directly in your backend.
+//Use a third-party Swift package for verifying Firebase tokens.
+//Since Firebase does not provide a native server-side Swift SDK, the best approach is to verify Firebase ID tokens manually using Google's public keys.
 let package = Package(
     name: "Backend_Property_Search",
     platforms: [
        .macOS(.v13)
     ],
     dependencies: [
-        // 💧 A server-side Swift web framework.
+        //  Vapor Framework
         .package(url: "https://github.com/vapor/vapor.git", from: "4.99.3"),
-        // 🗄 An ORM for SQL and NoSQL databases.
+        //  Fluent ORM
         .package(url: "https://github.com/vapor/fluent.git", from: "4.9.0"),
-        // 🪶 Fluent driver for SQLite.
+        //  Fluent driver for SQLite
         .package(url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.6.0"),
-        // 🔵 Non-blocking, event-driven networking for Swift. Used for custom executors
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
-        // importing JWT
-        .package(url: "https://github.com/vapor/jwt.git", from: "5.0.0-rc"),
-        
+        //  Swift NIO for async networking
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0")
     ],
     targets: [
-        .executableTarget(
+        .target(
             name: "App",
             dependencies: [
-                .product(name: "JWT", package: "jwt"),
-                .product(name: "Fluent", package: "fluent"),
-                .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
                 .product(name: "Vapor", package: "vapor"),
-                .product(name: "NIOCore", package: "swift-nio"),
-                .product(name: "NIOPosix", package: "swift-nio"),
+                .product(name: "Fluent", package: "fluent"),
+                .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver")
             ],
-            swiftSettings: swiftSettings
+            path: "Sources/App"
+        ),
+        .executableTarget(
+            name: "Run",
+            dependencies: ["App"],
+            path: "Sources/Run"
         ),
         .testTarget(
             name: "AppTests",
             dependencies: [
                 .target(name: "App"),
                 .product(name: "XCTVapor", package: "vapor"),
-            ],
-            swiftSettings: swiftSettings
+            ]
         )
     ],
     swiftLanguageModes: [.v5]
 )
-
-var swiftSettings: [SwiftSetting] { [
-    .enableUpcomingFeature("DisableOutwardActorInference"),
-    .enableExperimentalFeature("StrictConcurrency"),
-] }
