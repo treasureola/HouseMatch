@@ -64,8 +64,11 @@ struct Homepage: View {
                     Spacer()
 
                     Button(action: {
-                        fetchPropertiesAndStore()
-                        navigateToProperties = true  //Triggers NavigationLink
+                        fetchPropertiesAndStore { success in
+                            if success {
+                                navigateToProperties = true //Triggers NavigationLink
+                            }
+                        }
                     }) {
                         Text("View Properties")
                             .font(.headline)
@@ -91,11 +94,12 @@ struct Homepage: View {
        
     }
     
-    func fetchPropertiesAndStore() {
+    func fetchPropertiesAndStore(completion: @escaping (Bool) -> Void) {
         print("Fetching Properties")
         
         guard let userID = Auth.auth().currentUser?.uid else {
             print("Error: No authenticated user found.")
+            completion(false)
             return
         }
         
@@ -105,17 +109,20 @@ struct Homepage: View {
         userDoc.getDocument { (document, error) in
             if let error = error {
                 print("Error fetching user preferences: \(error.localizedDescription)")
+                completion(false)
                 return
             }
             
             guard let document = document, document.exists,
                   let userPreferences = document.data()?["preferences"] as? [String: Any] else {
                 print("No preferences found for user.")
+                completion(false)
                 return
             }
             
             guard let location = userPreferences["location"] as? String else {
                 print("Error: Missing or invalid user preferences.")
+                completion(false)
                 return
             }
             
@@ -125,16 +132,19 @@ struct Homepage: View {
                 .getDocuments { (snapshot, error) in
                     if let error = error {
                         print("Error checking existing properties: \(error.localizedDescription)")
+                        completion(false)
                         return
                     }
                     
                     let existingUnviewedCount = snapshot?.documents.count ?? 0
                     if existingUnviewedCount >= 50 {
                         print("User already has 50 unviewed properties, skipping fetch.")
+                        completion(true)
                         return
                     }
                     
                     fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db)
+                    completion(true)
                 }
         }
     }
