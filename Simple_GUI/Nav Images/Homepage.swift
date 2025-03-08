@@ -85,7 +85,7 @@ struct Homepage: View {
                         destination: SwipeablePropertiesView(),
                         isActive: $navigateToProperties
                     ) {
-                        EmptyView()
+                        EmptyView()  //Invisible link
                     }
                     
                 }
