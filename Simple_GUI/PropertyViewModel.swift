@@ -22,6 +22,7 @@ class PropertyViewModel: ObservableObject {
         
         let db = Firestore.firestore()
         
+        print("Database connected")
         db.collection("users").document(userID)
             .getDocument{ (document, error) in
                 if let error = error {
@@ -36,10 +37,14 @@ class PropertyViewModel: ObservableObject {
                     return
                 }
                 
+//                //call EC2 instance
+//                self.triggerEC2(userID: userID)
+                
                 db.collection("properties")
                     .whereField("assignedUserID", isEqualTo: userID)
                     .whereField("viewed", isEqualTo: false)
                     .whereField("city", isEqualTo: location)
+//                    .order(by: "recommendation_score", descending: true)
                     .limit(to: 25)
                     .getDocuments { (snapshot, error) in
                     if let error = error {
@@ -67,10 +72,28 @@ class PropertyViewModel: ObservableObject {
                                 squareFeet: data["square_feet"] as? Int ?? 0,
                                 amenities: amenities,
                                 petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
+//                                recommendationScore: data["recommendation_score"] as? Float ?? 0.0
                             )
                         } ?? []
+                        
                     }
                 }
             }
     }
+    
+//    func triggerEC2(userID: String) {
+//        guard let url = URL(string: "http://your-ec2-public-ip:5000/run-ml?userID=\(userID)") else { return }
+//        
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//
+//        URLSession.shared.dataTask(with: request) { _, _, error in
+//            if let error = error {
+//                print("Error triggering EC2: \(error.localizedDescription)")
+//            } else {
+//                print("EC2 told to run ML model")
+//            }
+//        }.resume()
+//    }
+
 }
