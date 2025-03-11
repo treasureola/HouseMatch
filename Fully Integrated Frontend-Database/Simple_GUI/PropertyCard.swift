@@ -17,20 +17,6 @@ struct PropertyCard: View {
 
     @State private var offset: CGSize = .zero
     @State private var color: Color = .white
-    
-    //track which property
-    @Binding var activePropertyID: String?
-    
-    //for ML
-    @State private var entryTimestamp: Date?
-    @State private var exitTimestamp: Date?
-    @State private var totalViewTime: TimeInterval = 0
-    @State private var clicked = false
-    @State private var isFavorited = false
-    
-    var isActive: Bool{
-        return activePropertyID == property.id
-    }
 
     var body: some View {
         ZStack {
@@ -67,12 +53,6 @@ struct PropertyCard: View {
                         .font(.subheadline)
                         .padding(.vertical, 5)
                     
-                    if property.petFriendly {
-                        Text("🐾 Pet-Friendly")
-                            .foregroundColor(.green)
-                            .font(.subheadline)
-                    }
-                    
                     Divider().padding(.vertical, 5)
                     
                     VStack(alignment: .leading) {
@@ -94,43 +74,24 @@ struct PropertyCard: View {
                     }
                     .padding(.top, 5)
                     
+                    if property.petFriendly {
+                        Text("🐾 Pet-Friendly")
+                            .foregroundColor(.green)
+                            .font(.subheadline)
+                    }
                     
                     Spacer()
                     
                     // Button to view more details
                     if let url = URL(string: property.listingURL){
-                        Button(action: {
-                            clicked = true
-                            storeInteraction()
-                            UIApplication.shared.open(url)
-                        }){
-                            Text("View Listing")
-                                .foregroundColor(.blue)
-                                .padding()
-                        }
-                    }
-                    
-                    //Favorite Button
-                    Button(action: {
-                        isFavorited.toggle()
-                        storeInteraction()
-                    }){
-                        Text(isFavorited ? "⭐ Favorited" : "☆ Favorite")
+                        Link("View Listing", destination: url)
                             .foregroundColor(.blue)
                             .padding()
                     }
+                    
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .onChange(of: isActive){ newValue in
-                    if newValue {
-                        entryTimestamp = Date()
-                    } else {
-                        exitTimestamp = Date()
-                        calculateTotalViewTime()
-                        storeInteraction()
-                    }
-                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(color)
@@ -145,14 +106,9 @@ struct PropertyCard: View {
                     }
                     .onEnded { _ in
                         if abs(offset.width) > 150 {
-                            exitTimestamp = Date()
-                            calculateTotalViewTime()
-                            storeInteraction()
-                            
                             markPropertyAsViewed(property)
                             saveLikedProperty(property)
                             onRemove?() // Remove the card if swiped far enough
-                            activePropertyID = nil
                         } else {
                             withAnimation {
                                 offset = .zero
@@ -163,64 +119,6 @@ struct PropertyCard: View {
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    
-    func calculateTotalViewTime() {
-        if let entry = entryTimestamp, let exit = exitTimestamp {
-            totalViewTime = exit.timeIntervalSince(entry)
-        }
-    }
-    
-    func determineRating() -> Int{
-        
-        if isFavorited {
-            return 5
-        }
-        
-        //change to 30 in future
-        if totalViewTime > 10 {
-            return 4
-        }
-        
-        //change to 15 in the future
-        if totalViewTime > 5 {
-            return 3
-        }
-        
-        if clicked{
-            return 2
-        }
-        
-        return 1
-    }
-    
-    func storeInteraction(){
-        guard let userID = Auth.auth().currentUser?.uid else{
-            print("User not authenticated")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let interactionRef = db.collection("interactions").document("\(userID)-\(property.id)")
-        
-        let interactionData: [String: Any] = [
-            "user_id": userID,
-            "property_id": property.id,
-            "clicks": clicked,
-            "favorited": isFavorited,
-            "rating": determineRating(),
-            "entry_timestamp": entryTimestamp ?? Date(),
-            "exit_timestamp": exitTimestamp ?? Date(),
-            "total_time": totalViewTime
-        ]
-        
-        interactionRef.setData(interactionData, merge: true){ error in
-            if let error = error {
-                print("Error saving interaction: \(error.localizedDescription)")
-            } else {
-                print("Interaction recorded for property \(property.id)")
-            }
-        }
     }
     
     func markPropertyAsViewed(_ property: Property) {
