@@ -201,11 +201,10 @@ struct PropertyCard: View {
         }
         
         let db = Firestore.firestore()
-        let interactionRef = db.collection("interactions").document("\(userID)-\(property.id)")
+        let interactionRef = db.collection("users").document(userID).collection("interactions").document(property.propertyID)
         
         let interactionData: [String: Any] = [
-            "user_id": userID,
-            "property_id": property.id,
+            "property_id": property.propertyID,
             "clicks": clicked,
             "favorited": isFavorited,
             "rating": determineRating(),
@@ -244,7 +243,7 @@ struct PropertyCard: View {
         
         let db = Firestore.firestore()
         let likedHomeData: [String: Any] = [
-            "propertyID": property.id,
+            "propertyID": property.propertyID,
             "address": property.address,
             "price": property.price,
             "bedrooms": property.bedrooms,
@@ -252,7 +251,9 @@ struct PropertyCard: View {
             "imageUrl": property.imageUrl,
             "listingID": property.listingID,
             "listingURL": property.listingURL,
-            "timestamp": Timestamp()
+            "timestamp": Timestamp(),
+            "favortie": isFavorited,
+            "rating": determineRating()
         ]
         
         db.collection("users").document(userID).collection("likedHomes").document(property.id).setData(likedHomeData){ error in
