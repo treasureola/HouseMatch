@@ -13,7 +13,7 @@ import re
 try:
     firebase_admin.get_app()
 except ValueError:  # App doesn't exist
-    cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json") #REPLACE WITH YOUR SERVICE ACCOUNT KEY
+    cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json") 
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
