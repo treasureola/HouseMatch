@@ -201,19 +201,19 @@ struct PropertyCard: View {
         }
         
         let db = Firestore.firestore()
-        let interactionRef = db.collection("users").document(userID).collection("interactions").document(property.propertyID)
+        let propertyRef = db.collection("properties").document(property.id)
         
         let interactionData: [String: Any] = [
-            "property_id": property.propertyID,
             "clicks": clicked,
             "favorited": isFavorited,
             "rating": determineRating(),
             "entry_timestamp": entryTimestamp ?? Date(),
             "exit_timestamp": exitTimestamp ?? Date(),
-            "total_time": totalViewTime
+            "total_time": totalViewTime,
+            "timestamp": FieldValue.serverTimestamp()
         ]
         
-        interactionRef.setData(interactionData, merge: true){ error in
+        propertyRef.updateData(interactionData){ error in
             if let error = error {
                 print("Error saving interaction: \(error.localizedDescription)")
             } else {
@@ -252,7 +252,7 @@ struct PropertyCard: View {
             "listingID": property.listingID,
             "listingURL": property.listingURL,
             "timestamp": Timestamp(),
-            "favortie": isFavorited,
+            "favorite": isFavorited,
             "rating": determineRating()
         ]
         

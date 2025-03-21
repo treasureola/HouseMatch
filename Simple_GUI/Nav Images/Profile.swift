@@ -146,8 +146,10 @@ struct Profile: View {
 
         let db = Firestore.firestore()
         db.collection("users").document(userID).collection("likedHomes")
-            .order(by: "timestamp", descending: true).order(by: "rating", descending: true)
-            .getDocuments { snapshot, error in
+            .order(by: "timestamp", descending: true)
+            .getDocuments {
+ snapshot,
+ error in
                 if let error = error {
                     print("Error fetching liked homes: \(error.localizedDescription)")
                     return
@@ -161,10 +163,11 @@ struct Profile: View {
                     return
                 }
 
-                let fetchedHomes: [LikedHome] = snapshot?.documents.compactMap { doc in
+                let fetchedHomes: [LikedHome] =
+                    snapshot?.documents.compactMap { doc in
                     let data = doc.data()
                     return LikedHome(
-                        id: data["property_id"] as? String ?? "",
+                        id: data["propertyID"] as? String ?? "",
                         address: data["address"] as? String ?? "Unknown Address",
                         price: data["price"] as? Int ?? 0,
                         bedrooms: data["bedrooms"] as? Int ?? 0,
