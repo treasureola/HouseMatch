@@ -7,16 +7,17 @@ from scipy.special import expit  # For sigmoid (logistic) function
 import firebase_admin
 from firebase_admin import credentials, firestore
 import re
+import json
 
-# --- 0. Firebase Initialization (Outside any function) ---
-# Initialize Firebase Admin SDK (Only once at the beginning)
-try:
-    firebase_admin.get_app()
-except ValueError:  # App doesn't exist
-    cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json") 
-    firebase_admin.initialize_app(cred)
+# # --- 0. Firebase Initialization ---
+# # Initialize Firebase Admin SDK
+# try:
+#     firebase_admin.get_app()
+# except ValueError:  # App doesn't exist
+#     cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json") 
+#     firebase_admin.initialize_app(cred)
 
-db = firestore.client()
+# db = firestore.client()
 
 
 # --- 1. Load Pre-trained Word Embeddings ---
@@ -24,50 +25,56 @@ word_vectors = api.load("glove-wiki-gigaword-100")
 
 # --- 2. Data Retrieval and Preprocessing (from Firestore) ---
 
-def fetch_data_from_firestore():
-    """Fetches user interaction and property data from Firestore."""
-    users_ref = db.collection("users")
-    all_interactions = []
-    all_properties = {}  # Store property details by ID
+# def fetch_data_from_firestore():
+#     """Fetches user interaction and property data from Firestore."""
+#     users_ref = db.collection("users")
+#     all_interactions = []
+#     all_properties = {}  # Store property details by ID
 
-    # Fetch all properties for efficiency
-    properties_ref = db.collection("properties")
-    for prop_doc in properties_ref.stream():
-        property_data = prop_doc.to_dict()
-        property_data['id'] = prop_doc.id  # Ensure property ID is included
-        all_properties[prop_doc.id] = property_data
+#     # Fetch all properties for efficiency
+#     properties_ref = db.collection("properties")
+#     for prop_doc in properties_ref.stream():
+#         property_data = prop_doc.to_dict()
+#         property_data['id'] = prop_doc.id  # Ensure property ID is included
+#         all_properties[prop_doc.id] = property_data
 
-    #Fetch Interactions
-    for user_doc in users_ref.stream():
-        user_id = user_doc.id
-        interactions_ref = db.collection("interactions")
-        query = interactions_ref.where("user_id", "==", user_id)
+#     #Fetch Interactions
+#     for user_doc in users_ref.stream():
+#         user_id = user_doc.id
+#         interactions_ref = db.collection("interactions")
+#         query = interactions_ref.where("user_id", "==", user_id)
 
-        for interaction_doc in query.stream():
-            interaction = interaction_doc.to_dict()
-            # Fetch the associated property directly from our dictionary
-            property_id = interaction["property_id"]
-            if property_id in all_properties:
-              property_info = all_properties[property_id]
-              # Combine interaction and property data
-              combined_data = {
-                  "user_id": user_id,
-                  "property_id": property_id,
-                  "bedrooms": property_info.get("bedrooms", 0),  # Use .get() with defaults
-                  "bathrooms": property_info.get("bathrooms", 0),
-                  "price": property_info.get("price", 0),
-                  "sqft": property_info.get("squareFeet", 0),
-                  "details": property_info.get("amenities", []), #amenities is the details
-                  "rating": interaction.get("rating", 1),  # Default to 1 if not found
-                  "favorited": interaction.get("favorited", False),
-                  "clicked": interaction.get("clicks", False), #clicks is boolean
-                  "total_time": interaction.get("total_time", 0)
-              }
-              all_interactions.append(combined_data)
-            else:
-                print(f"Warning: Property {property_id} not found for interaction.")
+#         for interaction_doc in query.stream():
+#             interaction = interaction_doc.to_dict()
+#             # Fetch the associated property directly from our dictionary
+#             property_id = interaction["property_id"]
+#             if property_id in all_properties:
+#               property_info = all_properties[property_id]
+#               # Combine interaction and property data
+#               combined_data = {
+#                   "user_id": user_id,
+#                   "property_id": property_id,
+#                   "bedrooms": property_info.get("bedrooms", 0),  # Use .get() with defaults
+#                   "bathrooms": property_info.get("bathrooms", 0),
+#                   "price": property_info.get("price", 0),
+#                   "sqft": property_info.get("squareFeet", 0),
+#                   "details": property_info.get("amenities", []), #amenities is the details
+#                   "rating": interaction.get("rating", 1),  # Default to 1 if not found
+#                   "favorited": interaction.get("favorited", False),
+#                   "clicked": interaction.get("clicks", False), #clicks is boolean
+#                   "total_time": interaction.get("total_time", 0)
+#               }
+#               all_interactions.append(combined_data)
+#             else:
+#                 print(f"Warning: Property {property_id} not found for interaction.")
 
-    return pd.DataFrame(all_interactions)
+#     return pd.DataFrame(all_interactions)
+
+def load_data_from_json(path):
+    """Loads data from a JSON file and returns a Pandas DataFrame."""
+    with open(path, 'r') as f:
+        data = json.load(f)
+    return pd.DataFrame(data)
 
 
 def clean_amenities(amenities_list):
@@ -174,7 +181,8 @@ def recommend_properties(user_id, properties_df, model, detail_to_embedding):
 
 # --- 6. Main Execution Block ---
 if __name__ == "__main__":
-    df = fetch_data_from_firestore()
+    # df = fetch_data_from_firestore()
+    df = load_data_from_json("fake_data.json")
 
     if df.empty:
         print("No interaction data found.  Exiting.")
