@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCtcdgfa5LvCuH2K8Jn4HF_0C20SjPmCnE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>903932054568</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.Kweku.Simple-GUI</string>
+	<key>PROJECT_ID</key>
+	<string>housematch-official</string>
+	<key>STORAGE_BUCKET</key>
+	<string>housematch-official.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:903932054568:ios:a80040120c0cc1f8c4391d</string>
+</dict>
+</plist>
