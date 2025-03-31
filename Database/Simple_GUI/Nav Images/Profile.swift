@@ -24,6 +24,9 @@ struct Profile: View {
     @EnvironmentObject var userInfo: UserInfo
     @State private var likedHomes: [LikedHome] = []
     
+    @State private var showLogoutError = false
+    @State private var logoutError = ""
+    
     var body: some View {
         ScrollView{
             VStack(spacing: 20){
@@ -73,7 +76,7 @@ struct Profile: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6)))//for the overlay of a ligth gray background color
                 .padding(.horizontal) //adds some padding on both sides
                 
-                //4. Saved Preferences
+                //4. Like Homes
                 .padding(.bottom, 20)
                 
                 VStack(alignment: .leading, spacing: 15){
@@ -92,52 +95,64 @@ struct Profile: View {
                     }
                 }
                 .padding(.horizontal)
-                .onAppear{
-                    fetchUserInfo()
-                    fetchLikedHomes()
-                }
                 
                 
+                Spacer(minLength: 30)
                 
-                NavigationLink(destination: LoginScreenView(username: "", theEmail: "", thePassword: "")){
+                Button(action: handleLogout){
                     Text("Log Out")
                         .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 20).stroke(Color.red))
-                    
+                        .padding(10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.red, lineWidth: 1)
+                        )
                 }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
+        }
+        .navigationTitle("Profile")
+        .onAppear{
+//            fetchUserInfo()
+            fetchLikedHomes()
+        }
+        .alert("Logout Error", isPresented: $showLogoutError){
+            Button("OK", role: .cancel){
+                print("User logging out")
+            }
+        } message: {
+            Text(logoutError)
         }
     }
     
-    func fetchUserInfo() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("No authenticated user found.")
-            return
-        }
-
-        let db = Firestore.firestore()
-        let userDoc = db.collection("users").document(userID)
-
-        userDoc.getDocument { (document, error) in
-            if let error = error {
-                print("Error fetching user info: \(error.localizedDescription)")
-                return
-            }
-
-            guard let data = document?.data() else {
-                print("No user data found in Firestore.")
-                return
-            }
-
-            DispatchQueue.main.async {
-                userInfo.firstName = data["first_name"] as? String ?? "Unknown"
-                userInfo.lastName = data["last_name"] as? String ?? "User"
-                userInfo.email = data["email"] as? String ?? "No Email"
-            }
-        }
-    }
+//    func fetchUserInfo() {
+//        guard let userID = Auth.auth().currentUser?.uid else {
+//            print("No authenticated user found.")
+//            return
+//        }
+//
+//        let db = Firestore.firestore()
+//        let userDoc = db.collection("users").document(userID)
+//
+//        userDoc.getDocument { (document, error) in
+//            if let error = error {
+//                print("Error fetching user info: \(error.localizedDescription)")
+//                return
+//            }
+//
+//            guard let data = document?.data() else {
+//                print("No user data found in Firestore.")
+//                return
+//            }
+//
+//            DispatchQueue.main.async {
+//                userInfo.firstName = data["first_name"] as? String ?? "Unknown"
+//                userInfo.lastName = data["last_name"] as? String ?? "User"
+//                userInfo.email = data["email"] as? String ?? "No Email"
+//            }
+//        }
+//    }
 
         
     //fetch liked homes from firestore
@@ -147,16 +162,27 @@ struct Profile: View {
         let db = Firestore.firestore()
         db.collection("users").document(userID).collection("likedHomes")
             .order(by: "timestamp", descending: true)
-            .getDocuments { snapshot, error in
+            .getDocuments {
+ snapshot,
+ error in
                 if let error = error {
                     print("Error fetching liked homes: \(error.localizedDescription)")
                     return
                 }
+                
+                guard let documents = snapshot?.documents else {
+                    print("No liked homes found")
+                    DispatchQueue.main.async {
+                        self.likedHomes = []
+                    }
+                    return
+                }
 
-                let fetchedHomes: [LikedHome] = snapshot?.documents.compactMap { doc in
+                let fetchedHomes: [LikedHome] =
+                    snapshot?.documents.compactMap { doc in
                     let data = doc.data()
                     return LikedHome(
-                        id: doc.documentID,
+                        id: data["propertyID"] as? String ?? "",
                         address: data["address"] as? String ?? "Unknown Address",
                         price: data["price"] as? Int ?? 0,
                         bedrooms: data["bedrooms"] as? Int ?? 0,
@@ -170,6 +196,17 @@ struct Profile: View {
                     self.likedHomes = fetchedHomes
                 }
             }
+    }
+    
+    func handleLogout(){
+        do{
+            try Auth.auth().signOut()
+            print("Logged out successfully")
+        } catch let signOutError as NSError {
+            print("Error signing out: \(signOutError)")
+            logoutError = "Failed to log out: \(signOutError.localizedDescription)"
+            showLogoutError = true
+        }
     }
 
 }
