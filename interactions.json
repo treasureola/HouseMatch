@@ -1,0 +1,292 @@
+[
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:59:40.616836+00:00",
+        "property_id": "00txZXPBCxD17IRNavSR",
+        "rating": 3,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": false,
+        "total_time": 9.551092028617859,
+        "exit_timestamp": "2025-03-11T00:59:50.167927+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284320+00:00",
+        "property_id": "0631aavSDcTBjmqGB8iH",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51744306087494,
+        "exit_timestamp": "2025-03-11T00:28:11.801764+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284318+00:00",
+        "property_id": "0MebPrjoljxYCBVZ3OTQ",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517412900924683,
+        "exit_timestamp": "2025-03-11T00:28:11.801732+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284316+00:00",
+        "property_id": "0OzFOvut9eWYR62XCFe5",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517386078834534,
+        "exit_timestamp": "2025-03-11T00:28:11.801702+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284314+00:00",
+        "property_id": "0RXJI1uDw4VcTinrCGST",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517355918884277,
+        "exit_timestamp": "2025-03-11T00:28:11.801670+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284311+00:00",
+        "property_id": "0SULd3EXzjV2T2CJZ2aH",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517327904701233,
+        "exit_timestamp": "2025-03-11T00:28:11.801639+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284308+00:00",
+        "property_id": "0UvH4ajnTczhYe77aFZF",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517298936843872,
+        "exit_timestamp": "2025-03-11T00:28:11.801608+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284307+00:00",
+        "property_id": "0YWuUrwzytz1a20Dncto",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517271041870117,
+        "exit_timestamp": "2025-03-11T00:28:11.801578+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284302+00:00",
+        "property_id": "0eVvRjlwmNW7dkEVUsJH",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51724410057068,
+        "exit_timestamp": "2025-03-11T00:28:11.801547+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284299+00:00",
+        "property_id": "0icYf8E980ghWPYnrSwl",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517216086387634,
+        "exit_timestamp": "2025-03-11T00:28:11.801516+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284297+00:00",
+        "property_id": "0m2oHAkGsd2hKl1KSOWp",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517186999320984,
+        "exit_timestamp": "2025-03-11T00:28:11.801485+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284295+00:00",
+        "property_id": "0rvqKlYwg7jn08DjHiFr",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51715898513794,
+        "exit_timestamp": "2025-03-11T00:28:11.801454+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284293+00:00",
+        "property_id": "0uesWQkBycYfEnxb2Je9",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51712989807129,
+        "exit_timestamp": "2025-03-11T00:28:11.801423+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284289+00:00",
+        "property_id": "0wnMbyBvd2qtlLQYmLva",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.5171000957489,
+        "exit_timestamp": "2025-03-11T00:28:11.801390+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284286+00:00",
+        "property_id": "17HxZxklIxdkZk0SKapw",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51707100868225,
+        "exit_timestamp": "2025-03-11T00:28:11.801357+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284283+00:00",
+        "property_id": "17L9Q0fKZcOXat826UoS",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517042994499207,
+        "exit_timestamp": "2025-03-11T00:28:11.801326+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284278+00:00",
+        "property_id": "19EwvyOxUZDZNW68rFmR",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517014980316162,
+        "exit_timestamp": "2025-03-11T00:28:11.801293+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284276+00:00",
+        "property_id": "1BRRIWUxPZZri8BaYhvV",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.516983032226562,
+        "exit_timestamp": "2025-03-11T00:28:11.801259+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284274+00:00",
+        "property_id": "1Dus7YDA6738dBmECuVy",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51695203781128,
+        "exit_timestamp": "2025-03-11T00:28:11.801226+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284271+00:00",
+        "property_id": "1Dz0c6zuZdZW31IjbgXF",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.516919016838074,
+        "exit_timestamp": "2025-03-11T00:28:11.801189+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284267+00:00",
+        "property_id": "1JolpV96DFEfnDprTLM6",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.51687800884247,
+        "exit_timestamp": "2025-03-11T00:28:11.801146+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284265+00:00",
+        "property_id": "1hNvjJPeODoUlY6cq8s3",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.516719937324524,
+        "exit_timestamp": "2025-03-11T00:28:11.800984+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284260+00:00",
+        "property_id": "1k9aFpSAAdwqLKSJBXxc",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 28.517565965652466,
+        "exit_timestamp": "2025-03-11T00:28:11.801826+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:17:33.845126+00:00",
+        "property_id": "1xhPIOB3UmhWewfjD0S4",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 40.0549019575119,
+        "exit_timestamp": "2025-03-11T00:18:13.900027+00:00"
+    },
+    {
+        "favorited": true,
+        "entry_timestamp": "2025-03-11T00:17:33.845069+00:00",
+        "rating": 5,
+        "property_id": "268LCIKDCVja0axPWzjx",
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 3,
+        "total_time": 32.99856495857239,
+        "exit_timestamp": "2025-03-11T00:18:06.843635+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:27:43.284257+00:00",
+        "property_id": "2CRpGye9aYaOqQNHtnVe",
+        "rating": 4,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 3,
+        "total_time": 24.08484196662903,
+        "exit_timestamp": "2025-03-11T00:28:07.369100+00:00"
+    },
+    {
+        "favorited": true,
+        "entry_timestamp": "2025-03-11T00:27:43.284233+00:00",
+        "property_id": "2D3XMepcbZcLGLXIHgF3",
+        "rating": 5,
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": 0,
+        "total_time": 9.703817009925842,
+        "exit_timestamp": "2025-03-11T00:27:52.988049+00:00"
+    },
+    {
+        "favorited": false,
+        "entry_timestamp": "2025-03-11T00:59:58.157181+00:00",
+        "rating": 1,
+        "property_id": "2FsyIxGialKfwpFuqCqD",
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": false,
+        "total_time": 0.0,
+        "exit_timestamp": "2025-03-11T00:59:58.156970+00:00"
+    },
+    {
+        "favorited": true,
+        "entry_timestamp": "2025-03-11T00:59:50.148058+00:00",
+        "rating": 5,
+        "property_id": "2H0uuGrDfzM53D2ARW9P",
+        "user_id": "6SMA58FmI0Osi0CaD78zDGrpSUd2",
+        "clicks": false,
+        "total_time": 0.0,
+        "exit_timestamp": "2025-03-11T00:59:50.147984+00:00"
+    }
+]
