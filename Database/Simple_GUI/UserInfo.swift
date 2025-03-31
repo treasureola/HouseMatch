@@ -21,4 +21,10 @@ class UserInfo: ObservableObject {
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var email: String = ""
+    
+    func clear(){
+        firstName = ""
+        lastName = ""
+        email = ""
+    }
 }

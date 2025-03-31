@@ -13,6 +13,7 @@ import FirebaseFirestore
 
 struct SwipeablePropertiesView: View {
     @StateObject private var viewModel = PropertyViewModel()
+    @State private var activePropertyID: String?
 
     var body: some View {
         ZStack {
@@ -22,10 +23,17 @@ struct SwipeablePropertiesView: View {
                     .padding()
             } else {
                 ForEach(viewModel.properties) { property in
-                    PropertyCard(property: property) {
+                    PropertyCard(property: property, onRemove: {
                         // Remove the property from the list when swiped
                         viewModel.properties.removeAll { $0.id == property.id }
-                    }
+
+                        // Set the next property as active
+                        if let nextProperty = viewModel.properties.first {
+                            activePropertyID = nextProperty.id
+                        } else {
+                            activePropertyID = nil
+                        }
+                    }, activePropertyID: $activePropertyID)
                     .padding()
                 }
             }
@@ -33,6 +41,11 @@ struct SwipeablePropertiesView: View {
         .onAppear {
             print("Fetching properties on appear...")
             viewModel.fetchProperties() // Fetch properties when view loads
+            
+            // Set the first property as active when view appears
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                activePropertyID = viewModel.properties.first?.id
+            }
         }
     }
 

@@ -17,10 +17,6 @@ let db = Firestore.firestore()
 //This is the front page/Welcome page of the application
 struct WelcomeView: View {
     
-    @State private var firstName = ""
-    @State private var email = ""
-    @State private var password = ""
-    
     var body: some View {
         NavigationView {
             VStack {  //stacking elements vertically
@@ -41,7 +37,7 @@ struct WelcomeView: View {
 
                 Spacer()
                 //The get Started button
-                NavigationLink(destination: LoginScreenView(username: firstName, theEmail: email, thePassword: password)) {
+                NavigationLink(destination: LoginScreenView()) {
                     Text("Get Started")
                         .font(.title2)
                         .bold()
@@ -54,6 +50,7 @@ struct WelcomeView: View {
             }
             .padding(.top, 5)
         }
+        .navigationViewStyle(.stack)
     }
 }
 
@@ -61,20 +58,24 @@ struct WelcomeView: View {
 //the login page's view
 struct LoginScreenView: View {
     @EnvironmentObject var userInfo: UserInfo
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var loginEmail = ""
     @State private var loginPassword = ""
     @State private var errorMessage = ""
-    
-    let username: String
-    let theEmail: String
-    let thePassword: String
+    @State private var isLoading = false
     
     
     let db = Firestore.firestore()
     
     func areLoginInputsValid() -> Bool {
-        return !loginEmail.isEmpty && !loginPassword.isEmpty
+        return !loginEmail.isEmpty && !loginPassword.isEmpty && isValidEmail(loginEmail)
+    }
+    
+    func isValidEmail(_ email: String) -> Bool{
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
     }
     
     var body: some View {
@@ -92,28 +93,34 @@ struct LoginScreenView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
+                .textContentType(.emailAddress)
                 .padding(.top, 10)
                 .padding(.horizontal)
+                .onChange(of: loginEmail){ _ in errorMessage = ""}
             
             SecureField("Password", text: $loginPassword)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.top, 10)
                 .padding(.horizontal)
+                .onChange(of: loginPassword){ _ in errorMessage = ""}
             Spacer()
             
-            NavigationLink(destination: SignUpTransitionView()){
-                Text("Login Here")
+            Button(action: handleLogin){
+                Text("Login")
                     .font(.title2)
                     .bold()
                     .foregroundColor(.white)
                     .padding(.horizontal, 50)
                     .padding(.vertical, 10)
-                    .background(areLoginInputsValid() ? Color.purple : Color.gray) //if its invalid the sign-up will be  gray
-                    .cornerRadius(15)
+                    .background(areLoginInputsValid() && !isLoading ? Color.purple : Color.gray)
+                    .cornerRadius(20)
             }
-            .disabled(!areLoginInputsValid()) //this would disable if inputs are invalid
-            .onTapGesture {
-                handleLogin()
+            .disabled(!areLoginInputsValid() || isLoading) //this would disable if inputs are invalid
+            .padding(.horizontal)
+            
+            if isLoading{
+                ProgressView()
+                    .padding(.top, 10)
             }
             
             
@@ -122,70 +129,60 @@ struct LoginScreenView: View {
                     .foregroundColor(.red)
                     .font(.footnote)
                     .padding(.top, 5)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
             }
             
-            //                Spacer()
-            //                // Side-by-side buttons
-            //                HStack {
-            //                    NavigationLink(destination: SwipeablePropertiesView()) {
-            //                        Text("View Properties")
-            //                            .frame(width: 150, height: 20)
-            //                            .padding(.top, 5)
-            //                            .background(
-            //                                areLoginInputsValid() ? Color.blue : Color.gray
-            //                            )
-            //                            .foregroundColor(.white)
-            //                            .cornerRadius(8)
-            //                    }
-            //                    .disabled(!areLoginInputsValid())
-            //                    .onTapGesture {
-            //                        handleLogin()
-            //                    }
-            //                    NavigationLink(destination: FindDreamHome()) {
-            //                        Text("Make Preferences")
-            //                            .frame(width: 150, height: 20)
-            //                            .padding(.top, 5)
-            //                            .background(
-            //                                areLoginInputsValid() ? Color.green : Color.gray
-            //                            )
-            //                            .foregroundColor(.white)
-            //                            .cornerRadius(8)
-            //                    }
-            //                    .disabled(!areLoginInputsValid())
-            //                }
-            //                .navigationTitle("Login")
-            //            }
             HStack{
                 Text("Don't have an account?")
                 NavigationLink(destination: SignUpView()){
                     Text("Sign Up")
                         .foregroundColor(.blue)
                 }
+                .padding(.top, 20)
             }
             .navigationTitle("Login")
         }
     }
     
     func handleLogin() {
-        Auth.auth().signIn(withEmail: loginEmail, password: loginPassword) {
-            result, error in
+        guard areLoginInputsValid() else {
+            errorMessage = "Please enter valid email and password"
+            return
+        }
+        isLoading = true
+        errorMessage = ""
+        
+        
+        Auth.auth().signIn(withEmail: loginEmail, password: loginPassword) { result, error in
+            isLoading = false
+            
             if let error = error {
                 errorMessage = "Login failed: \(error.localizedDescription)"
-            } else {
+            } else if let user = result?.user{
                 //successful
-                let uid = result?.user.uid
-                let userDoc = db.collection("users").document(uid!)
-                userDoc.getDocument { (document, error) in
-                   if let document = document, document.exists, let userData = document.data() {
-                       DispatchQueue.main.async {
-                           userInfo.firstName = userData["first_name"] as? String ?? ""
-                           userInfo.lastName = userData["last_name"] as? String ?? ""
-                           userInfo.email = userData["email"] as? String ?? ""
-                       }
-                   } else {
-                       print("User document does not exist or error fetching data: \(error?.localizedDescription ?? "Unknown error")")
-                   }
-               }
+                fetchFirestoreUserInfo(uid: user.uid)
+                print("Login successful for user: \(user.uid)")
+            } else{
+                errorMessage = "Unknown error occurred during login"
+            }
+        }
+    }
+    
+    func fetchFirestoreUserInfo(uid: String){
+        let db = Firestore.firestore()
+        let userDoc = db.collection("users").document(uid)
+        userDoc.getDocument { (document, error) in
+            if let document = document, document.exists, let userData = document.data() {
+                DispatchQueue.main.async{
+                    userInfo.firstName = userData["first_name"] as? String ?? ""
+                    userInfo.lastName = userData["last_name"] as? String ?? ""
+                    userInfo.email = userData["email"] as? String ?? ""
+                    print("User fetched correctly")
+                }
+            } else {
+                print ("User doc does not exist")
+                errorMessage = "Could not load user profile. Please try again."
             }
         }
     }
@@ -196,16 +193,19 @@ struct LoginScreenView: View {
 //The Sign Up page
 struct SignUpView: View {
     @EnvironmentObject var userInfo: UserInfo
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var password = ""
     @State private var confirmPassword = ""
     
     //Error states
+    @State private var generalError = ""
     @State private var firstNameError = ""
     @State private var lastNameError = ""
     @State private var emailError = ""
     @State private var passwordError = ""
     @State private var confirmPasswordError = ""
+    @State private var isLoading = false
     
     //firebase instance
     let db = Firestore.firestore()
@@ -222,97 +222,113 @@ struct SignUpView: View {
             Spacer()
             
             //First name
-            TextField("First Name", text: $userInfo.firstName)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.top, 6)
-                .padding(.horizontal)
-            
-            if !firstNameError.isEmpty {
-                Text(firstNameError)
-                    .foregroundColor(.red)
-                    .font(.footnote)
-            }
+            ValidatedTextField(
+                placeholder: "First Name",
+                text: $userInfo.firstName,
+                errorMessage: $firstNameError,
+                validation: validateFirstName
+            )
+                
             
             //Last Name
-            TextField("Last Name", text: $userInfo.lastName)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.top, 6)
-                .padding(.horizontal)
-            
-            if !lastNameError.isEmpty {  //Was newly added
-                Text(lastNameError)
-                    .foregroundColor(.red)
-                    .font(.footnote)
-            }
+            ValidatedTextField(
+                placeholder: "Last Name",
+                text: $userInfo.lastName,
+                errorMessage: $lastNameError,
+                validation: validateLastName
+            )
             
             //Email
-            TextField("Email", text: $userInfo.email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-                .padding(.top, 6)
-                .padding(.horizontal)
+            ValidatedTextField(
+                placeholder: "Email",
+                text: $userInfo.email,
+                errorMessage: $emailError,
+                keyboardType: .emailAddress,
+                autocapitalization: .none,
+                textContentType: .emailAddress,
+                validation: validateEmail
+            )
             
-            if !emailError.isEmpty {  //Was newly added
-                Text(emailError)
-                    .foregroundColor(.red)
-                    .font(.footnote)
-            }
             
             //Password
-            SecureField("Password", text: $password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.top, 6)
-                .padding(.horizontal)
-            
-            if !passwordError.isEmpty {  //Was newly added
-                Text(passwordError)
-                    .foregroundColor(.red)
-                    .font(.footnote)
-            }
+            ValidatedSecureField(
+                placeholder: "Password",
+                text: $password,
+                errorMessage: $passwordError,
+                textContentType: .newPassword,
+                validation: validatePassword
+            )
             
             //Confirm Password
-            SecureField("Confirm Password", text: $confirmPassword)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.top, 6)
-                .padding(.horizontal)
+            ValidatedSecureField(
+                placeholder: "Confirm Password",
+                text: $confirmPassword,
+                errorMessage: $confirmPasswordError,
+                textContentType: .newPassword,
+                validation: validateConfirmPassword
+            )
             
-            if !confirmPasswordError.isEmpty {  //Was newly added
-                Text(confirmPasswordError)
+            if !generalError.isEmpty{
+                Text(generalError)
                     .foregroundColor(.red)
                     .font(.footnote)
+                    .padding(.top, 5)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
             }
             
             Spacer()
             Button(action: handlingSignUp) {
-                NavigationLink(destination: LoginScreenView(username:  userInfo.firstName, theEmail: userInfo.email, thePassword: password)){
-                    Text("Sign up")
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                        .padding(.top, 5)
-                        .frame(maxWidth: .infinity)
-                    //                        .frame(width: 150, height: 20)
-                        .background(areInputsValid() ? Color.purple : Color.gray) //if its invalid the sign-up will be  gray
-                        .cornerRadius(20)
-                        .padding(.horizontal)
-                }
-                .disabled(!areInputsValid()) //this would disable if inputs are invalid
-                .padding(.top, 30)
+                Text("Sign Up")
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(.white)
+                    .frame(width: 200, height: 50)
+                    .padding(.vertical, 10)
+                    .background(canAttemptSignUp() && !isLoading ? Color.purple : Color.gray)
+                    .cornerRadius(20)
             }
+            .disabled(!canAttemptSignUp() || isLoading)
+            .padding(.horizontal)
+            .padding(.bottom)
             
-            .padding(.top, 5)
+            if isLoading{
+                ProgressView()
+                    .padding(.top, 10)
+            }
+        }
+        .navigationTitle("Create Account")
+        .padding(.top, 5)
+        .onAppear{
             
-            .navigationTitle("Sign up Page")
         }
     }
     
-    //Making sure that all the inputs aren't empty and that
-    //password matches confirmpassword
-    func areInputsValid() -> Bool {
-        return !userInfo.firstName.isEmpty && !userInfo.lastName.isEmpty && !userInfo.email.isEmpty
-        && !password.isEmpty && password == confirmPassword
+    func canAttemptSignUp() -> Bool {
+        return !userInfo.firstName.isEmpty &&
+                !userInfo.lastName.isEmpty &&
+                !userInfo.email.isEmpty &&
+                userInfo.email.contains("@") &&
+                !password.isEmpty &&
+                password == confirmPassword &&
+                password.count >= 8 &&
+                generalError.isEmpty
     }
+    
+    func validateAllFields() -> Bool{
+        validateFirstName()
+        validateLastName()
+        validateEmail()
+        validatePassword()
+        validateConfirmPassword()
+        
+        return firstNameError.isEmpty &&
+                lastNameError.isEmpty &&
+                emailError.isEmpty &&
+                passwordError.isEmpty &&
+                confirmPasswordError.isEmpty
+    }
+    
     
     // Field-specific validation        //Was newly added
     func validateFirstName() {
@@ -334,7 +350,13 @@ struct SignUpView: View {
     }
     
     func validatePassword() {
-        passwordError = password.isEmpty ? "Password cannot be empty." : ""
+        if password.isEmpty {
+            passwordError = "Password cannot be empty."
+        } else if password.count < 8 {
+            passwordError = "Password must be at least 8 characters." // Firebase requirement
+        } else {
+            passwordError = ""
+        }
     }
     
     func validateConfirmPassword() {
@@ -345,56 +367,115 @@ struct SignUpView: View {
         } else {
             confirmPasswordError = ""
         }
+        generalError = ""
     }
     
     func handlingSignUp() {  //Was newly added
         
         print("In Handling SIgn Up")
         
-        firstNameError = ""
-        lastNameError = ""
-        emailError = ""
-        passwordError = ""
-        confirmPasswordError = ""
+        generalError = ""
         
-        // Re-validate all fields on sign-up attempt
-        validateFirstName()
-        validateLastName()
-        validateEmail()
-        validatePassword()
-        validateConfirmPassword()
-        
-        if areInputsValid() {
-            Auth.auth().createUser(withEmail: userInfo.email, password: password) {
-                authResult, error in
-                if let error = error {
-                    print("Error creating user: \(error.localizedDescription)")
-                } else if let user = authResult?.user {
-                    print("User created successfully! UID: \(user.uid)")
-                    
-                    let uid = user.uid
-                    let userDoc = db.collection("users").document(uid)
-                    let userData: [String: Any] = [
-                        "first_name": userInfo.firstName,
-                        "last_name": userInfo.lastName,
-                        "email": userInfo.email,
-                    ]
-                    
-                    userDoc.setData(userData) { error in
-                        if let error = error {
-                            print(
-                                "Firestore error: \(error.localizedDescription)"
-                            )
-                        } else {
-                            print("User saved in Firestore successfully!")
-                        }
-                    }
-                }
-            }
-        } else {
-            print("Validation failed. Please correct errors.")
+        guard validateAllFields() else{
+            print("Validation failed.")
+            generalError = "Please fix the errors above"
             return
         }
+        
+        isLoading = true
+        
+        Auth.auth().createUser(withEmail: userInfo.email, password: password) { authResult, error in
+            isLoading = false
+            if let error = error {
+                print("Error creating user: \(error.localizedDescription)")
+            } else if let user = authResult?.user {
+                print("User created successfully! UID: \(user.uid)")
+                saveUserData(uid: user.uid)
+            } else{
+                generalError = "An error occurred while creating your account."
+            }
+        }
+    }
+    
+    func saveUserData(uid: String){
+        let userDoc = db.collection("users").document(uid)
+        let userData: [String: Any] = [
+            "first_name": userInfo.firstName,
+            "last_name": userInfo.lastName,
+            "email": userInfo.email,
+            "createdAt": Timestamp()
+        ]
+        userDoc.setData(userData){ error in
+            if let error = error {
+                print("Firestore error saving user data: \(error.localizedDescription)")
+            } else {
+                print("User saved in Firestore successfully")
+            }
+        }
+    }
+}
+
+struct ValidatedTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    @Binding var errorMessage: String
+    var keyboardType: UIKeyboardType = .default
+    var autocapitalization: UITextAutocapitalizationType = .sentences
+    var textContentType: UITextContentType? = nil
+    let validation: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            TextField(placeholder, text: $text)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .keyboardType(keyboardType)
+                .autocapitalization(autocapitalization)
+                .textContentType(textContentType)
+                .padding(.horizontal)
+                .onChange(of: text) { _ in
+                    validation() // Validate on change
+                    errorMessage = ""
+                }
+                .onDisappear(perform: validation)
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.footnote)
+                    .padding(.horizontal)
+            }
+        }
+        .padding(.top, 6)
+    }
+}
+
+struct ValidatedSecureField: View {
+    let placeholder: String
+    @Binding var text: String
+    @Binding var errorMessage: String
+    var textContentType: UITextContentType? = nil
+    let validation: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            SecureField(placeholder, text: $text)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textContentType(textContentType)
+                .padding(.horizontal)
+                .onChange(of: text) { _ in
+                    validation()
+                    errorMessage = ""
+                }
+                .onDisappear(perform: validation)
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.footnote)
+                    .padding(.horizontal)
+            }
+        }
+        .padding(.top, 6)
     }
 }
  
