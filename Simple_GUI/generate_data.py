@@ -3,20 +3,39 @@ import random
 
 # --- Helper Functions ---
 
-def generate_property(property_id):
+def generate_property_interaction(prop_id, user_id_pool):
     """Generates a single property dictionary."""
     bedrooms = random.randint(1, 5)
-    bathrooms = random.randint(1, 3)
+    bathrooms = random.randint(1, 4)
     price = random.randint(1000, 5000)
     sqft = random.randint(600, 2500)
     details = random.sample(possible_details, random.randint(5, 10))  # 5-10 details
+    pet_friendly = random.choice([True, False])
+    assigned_user_id = random.choice(user_id_pool)
+    rating = random.randint(1, 5)
+    favorited = rating >= 4
+    clicked = rating >= 2 
+    total_time = random.randint(5, 30)
+    if rating == 5 or favorited:
+        total_time = random.randint(60, 300)
+    elif rating == 4:
+        total_time = random.randint(30, 120)
+    elif rating == 3:
+        total_time = random.randint(15, 60)
+
     return {
-        "property_id": f"prop{property_id}",
+        "property_id": prop_id,
         "bedrooms": bedrooms,
         "bathrooms": bathrooms,
         "price": price,
         "sqft": sqft,
         "details": details,
+        "pet_friendly": pet_friendly,
+        "assigned_user_id": assigned_user_id,
+        "rating": rating,
+        "favorited": favorited,
+        "clicked": clicked,
+        "total_time": total_time
     }
 
 def generate_user_interaction(user_id, property_id):
@@ -24,9 +43,8 @@ def generate_user_interaction(user_id, property_id):
     rating = random.randint(1, 5)
     favorited = random.choice([True, False])
     clicked = random.choice([True, False])
-    total_time = random.randint(0, 120)
+    total_time = random.randint(5, 120)
     return {
-        "user_id": user_id,
         "property_id": property_id,
         "rating": rating,
         "favorited": favorited,
@@ -51,52 +69,32 @@ possible_details = [
     "package receiving", "master bath", "large oversized windows",
      "berber carpeting in select bedrooms", "pet park", "open kitchen",
     "efficient appliances", "on-site maintenance", "kitchen with breakfast bar",
-    "granite quartz countertops available", "one mile from gallaudet university",
+    "granite quartz countertops available",
     "open layouts", "private entrance", "airy 9-foot ceilings", "fishing lake",
     "barn doors available", "professional landscaping", "kitchen with island",
-    "stainless steel appliances in select homes", "dogs allowed", "cats allowed"
+    "stainless steel appliances", "dogs allowed", "cats allowed"
 ]
 
 # --- Generate Data ---
 
-num_properties = 1000
-num_users = 50  #  You can adjust the number of users
-interactions_per_user = 5 # Adjust interactions per user
+num_records = 2500
+num_users = 50
+num_properties = 200
+user_ids = [f"user{i+1}" for i in range(num_users)]
 
-# 1. Generate Property Data
-properties = [generate_property(i + 1) for i in range(num_properties)]
-
-# 2. Generate User Interactions
-interactions = []
-for user_num in range(1, num_users + 1):
-    user_id = f"user{user_num}"
-    # Sample properties for each user to interact with
-    interacted_property_ids = random.sample(
-        [p["property_id"] for p in properties], interactions_per_user
-    )
-    for property_id in interacted_property_ids:
-        interactions.append(generate_user_interaction(user_id, property_id))
-
-
-# 3. Combine for Final JSON Structure (like Firestore output)
-#    We'll create a list of combined interaction + property data.
-
-combined_data = []
-for interaction in interactions:
-    property_info = next(
-        p for p in properties if p["property_id"] == interaction["property_id"]
-    )
-    combined = {**interaction, **property_info}  # Merge dictionaries
-    combined_data.append(combined)
+generated_data_list = []
+for i in range(num_records):
+    prop_id = random.randint(1, num_properties)
+    generated_data_list.append(generate_property_interaction(prop_id, user_ids))
 
 # --- Output as JSON ---
 # print(json.dumps(properties, indent=4))  # For just properties
 # print(json.dumps(interactions, indent=4)) # for just interactions
-print(json.dumps(combined_data, indent=4))   # Combined data (like your fetch_data_from_firestore)
+print(json.dumps(generated_data_list, indent=4))   # Combined data
 
 
 # --- To Create a pandas DataFrame---
 import pandas as pd
 
-df_synthetic = pd.DataFrame(combined_data)
+df_synthetic = pd.DataFrame(generated_data_list)
 # print(df_synthetic)  # Uncomment to view the DataFrame
