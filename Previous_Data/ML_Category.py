@@ -4,10 +4,36 @@ from collections import defaultdict
 from sentence_transformers import SentenceTransformer  
 from sklearn.metrics.pairwise import cosine_similarity  
 import pandas as pd  
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import firestore
 
 # __________INTEGRATION 1 _________ (LOAD DATA FROM DB)
 # Load categorized home dattails
 
+cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+doc_ref = db.collection("properties")
+docs = doc_ref.stream()
+existing_data = []
+for doc in docs:
+    db_data = doc.to_dict()
+    existing_data.append(db_data)
+
+with open("db.json", "w") as file:
+    json.dump(existing_data, file, indent=4)
+
+# Convert to dictionary with listing_id as key and amenities as value
+# listings_dict = {doc.id: doc.to_dict().get("amenities", []) for doc in docs}
+listings_dict = {}
+for house in existing_data:
+    id = house["property_id"]
+    amenities = house["amenities"]
+    listings_dict[id] = amenities
+
+    
 # Function to recursively convert dictionary keys to strings
 def convert_keys_to_string(data):
     if isinstance(data, dict):  # If the data is a dictionary
@@ -19,14 +45,15 @@ def convert_keys_to_string(data):
     else:  # If the data is neither a dictionary nor a list 
         return data
 
-# Load JSON Data (House Preferences)
-try:
-    with open("cur_data.json", "r") as file:
-        data = json.load(file)  # parse the JSON data from the file into a Python dictionary.
-except FileNotFoundError:  # If the file is not found
-    print("Error: cur_data.json not found.")  # Print an error message.
-    exit()  # Exit the program because the necessary data file is missing.
+# # Load JSON Data (House Preferences)
+# try:
+#     with open("cur_data.json", "r") as file:
+#         data = json.load(file)  # parse the JSON data from the file into a Python dictionary.
+# except FileNotFoundError:  # If the file is not found
+#     print("Error: cur_data.json not found.")  # Print an error message.
+#     exit()  # Exit the program because the necessary data file is missing.
 
+data = listings_dict
 # Load Sample Labeled Data
 labeled_data = [  # Create a list of tuples with preferences and their corresponding categories.
     ("Dogs Allowed", "Pet_Friendly"),
