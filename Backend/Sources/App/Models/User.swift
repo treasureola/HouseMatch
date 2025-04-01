@@ -79,6 +79,12 @@ struct UserInput: Content {
 struct TokenResponse: Content {
     let token: String
 }
+// ----------------------------------------------------- USER Registration MODEL ----------------------------------------------------- \\
+
+
+struct RegisterInput: Content {
+    let email: String
+}
 
 // ----------------------------------------------------- USER PREFERENCE MODEL ----------------------------------------------------- \\
 
