@@ -46,30 +46,23 @@ func routes(_ app: Application) throws {
     
     
     // ######################################### BACKEND USER-REGISTRATION CODE INTEGRATED ######################################################\\\
-    
+    app.post("register") { req async throws -> HTTPStatus in
+        let userInput = try req.content.decode(RegisterInput.self)
+        
+        let newUser = User(email: userInput.email)
+
+        // Check if the email already exists
+        if let _ = try await User.query(on: req.db)
+            .filter(\.$email == newUser.email)
+            .first() {
+            throw Abort(.conflict, reason: "Email already exists")
+        }
+
+        try await newUser.save(on: req.db)
+        return .ok
+    }
     // Backend User Registration Functionality
-   app.post("login") { req async throws -> TokenResponse in
-    let loginInput = try req.content.decode(UserInput.self)
-    print("[SERVER] Login endpoint hit") 
-    guard let firebaseToken = loginInput.token, !firebaseToken.isEmpty else {
-        app.logger.warning("Missing Firebase token")
-        throw Abort(.unauthorized, reason: "Missing Firebase token")
-    }
-
-    let verifiedUser = try await FirebaseAuthService.verifyToken(firebaseToken)
-    app.logger.info("Verified user with email: \(verifiedUser.email)")
-
-    guard let user = try await User.query(on: req.db)
-        .filter(\.$email == verifiedUser.email)
-        .first() else {
-        app.logger.warning("User not found in DB for email: \(verifiedUser.email)")
-        throw Abort(.unauthorized, reason: "User not found. Please register before logging in.")
-    }
-
-    app.logger.info("User exists, logging in: \(user.email)")
-    return TokenResponse(token: firebaseToken)
-}
-
+   
     // ######################################### END OF BACKEND USER-REGISTRATION CODE INTEGRATED ######################################################\\\
     
     
@@ -146,27 +139,27 @@ func routes(_ app: Application) throws {
     
     // User Login (Firebase Authentication)
     app.post("login") { req async throws -> TokenResponse in
-        let loginInput = try req.content.decode(UserInput.self)
-
-        // Ensure the token is not nil and not empty
-        guard let firebaseToken = loginInput.token, !firebaseToken.isEmpty else {
-            throw Abort(.unauthorized, reason: "Missing Firebase token")
-        }
-
-        let verifiedUser = try await FirebaseAuthService.verifyToken(firebaseToken)
-
-        // Check if the user exists in the database
-        guard let user = try await User.query(on: req.db)
-            .filter(\.$email == verifiedUser.email)
-            .first() else {
-            throw Abort(.unauthorized, reason: "User not found. Please register before logging in.")
-        }
-
-        print("User exists, logging in: \(user.email)")
-
-        // Return a token response to the frontend
-        return TokenResponse(token: firebaseToken)
+    let loginInput = try req.content.decode(UserInput.self)
+    print("[SERVER] Login endpoint hit") 
+    guard let firebaseToken = loginInput.token, !firebaseToken.isEmpty else {
+        app.logger.warning("Missing Firebase token")
+        throw Abort(.unauthorized, reason: "Missing Firebase token")
     }
+
+    let verifiedUser = try await FirebaseAuthService.verifyToken(firebaseToken)
+    app.logger.info("Verified user with email: \(verifiedUser.email)")
+
+    guard let user = try await User.query(on: req.db)
+        .filter(\.$email == verifiedUser.email)
+        .first() else {
+        app.logger.warning("User not found in DB for email: \(verifiedUser.email)")
+        throw Abort(.unauthorized, reason: "User not found. Please register before logging in.")
+    }
+
+    app.logger.info("User exists, logging in: \(user.email)")
+    return TokenResponse(token: firebaseToken)
+}
+
 
     // ######################################### END OF BACKEND LOGIN CODE INTEGRATED ######################################################\\\
     
