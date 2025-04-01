@@ -50,7 +50,7 @@ func routes(_ app: Application) throws {
     // Backend User Registration Functionality
    app.post("login") { req async throws -> TokenResponse in
     let loginInput = try req.content.decode(UserInput.self)
-
+    print("[SERVER] Login endpoint hit") 
     guard let firebaseToken = loginInput.token, !firebaseToken.isEmpty else {
         app.logger.warning("Missing Firebase token")
         throw Abort(.unauthorized, reason: "Missing Firebase token")
