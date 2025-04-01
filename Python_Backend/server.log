@@ -1,0 +1,16 @@
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: [Errno 65] No route to host
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [Errno 65] No route to host
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: timed out
+WARNING:google.auth._default:Authentication failed using Compute Engine authentication due to unavailable metadata server.
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: timed out
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: [Errno 64] Host is down
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [Errno 64] Host is down
+WARNING:google.auth._default:Authentication failed using Compute Engine authentication due to unavailable metadata server.
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: timed out
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: timed out
+WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [Errno 64] Host is down
+WARNING:google.auth._default:Authentication failed using Compute Engine authentication due to unavailable metadata server.
+INFO:root:API called for user_id=user123 at 2025-03-08 16:49:06
+INFO:root:API called for user_id=1YBHe3hQHsPHQAnvv53Sm2CSurW2 at 2025-03-08 16:49:47
+INFO:root:API called for user_id=1YBHe3hQHsPHQAnvv53Sm2CSurW2 at 2025-03-08 17:06:04
+INFO:root:API called for user_id=1YBHe3hQHsPHQAnvv53Sm2CSurW2 at 2025-03-09 17:40:54
