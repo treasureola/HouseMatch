@@ -15,6 +15,7 @@ class PropertyViewModel: ObservableObject {
     @Published var properties: [Property] = []
 
     func fetchProperties() {
+        print("We are fetching properties")
         guard let userID = Auth.auth().currentUser?.uid else {
             print("No authenticated user found.")
             return
@@ -81,19 +82,6 @@ class PropertyViewModel: ObservableObject {
             }
     }
     
-//    func triggerEC2(userID: String) {
-//        guard let url = URL(string: "http://your-ec2-public-ip:5000/run-ml?userID=\(userID)") else { return }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//
-//        URLSession.shared.dataTask(with: request) { _, _, error in
-//            if let error = error {
-//                print("Error triggering EC2: \(error.localizedDescription)")
-//            } else {
-//                print("EC2 told to run ML model")
-//            }
-//        }.resume()
-//    }
+
 
 }

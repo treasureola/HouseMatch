@@ -20,78 +20,86 @@ import SwiftUI
 
 struct Homepage: View {
     @State private var navigateToProperties = false
+    @State private var isLoading = false
     
     var body: some View {
-        ZStack{
-            Color.purple
-//                .edgesIgnoringSafeArea(.all)
-            VStack{
+        NavigationStack{
+            ZStack{
+                Color.purple
+                //                .edgesIgnoringSafeArea(.all)
                 VStack{
-                    Text("About Us")
-                        .font(.largeTitle)
-                        .bold()
-                        .foregroundColor(.black)
-                        .padding(.top, 40)
-                    
-                    
-                    
-    
-                    Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
-                        .font(.body)
-        
-                        .padding(.horizontal)
-                        .multilineTextAlignment(.center)
-                        .transition(.opacity)
-                        .padding(.top, 40)
-
-//                    
-                    Spacer()
-//
-
-//                        Image(systemName: "house.fill")
-//                            .foregroundColor(.white)
-//                            .font(.system(size: 90))
-            
-                    
-                    Image(.houseA)  //HouseMatch logo
-                        .resizable()
-                        .frame(width: 180, height: 180)
-                        .cornerRadius(50)
-                        .imageScale(.large)
-                        .foregroundStyle(.blue)
-                    
-                    
-                    Spacer()
-
-                    Button(action: {
-                        fetchPropertiesAndStore { success in
-                            if success {
-                                navigateToProperties = true //Triggers NavigationLink
+                    VStack{
+                        Text("About Us")
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.black)
+                            .padding(.top, 40)
+                        
+                        
+                        
+                        
+                        Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
+                            .font(.body)
+                        
+                            .padding(.horizontal)
+                            .multilineTextAlignment(.center)
+                            .transition(.opacity)
+                            .padding(.top, 40)
+                        
+                        //
+                        Spacer()
+                        //
+                        
+                        //                        Image(systemName: "house.fill")
+                        //                            .foregroundColor(.white)
+                        //                            .font(.system(size: 90))
+                        
+                        
+                        Image(.houseA)  //HouseMatch logo
+                            .resizable()
+                            .frame(width: 180, height: 180)
+                            .cornerRadius(50)
+                            .imageScale(.large)
+                            .foregroundStyle(.blue)
+                        
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            isLoading = true
+                            fetchPropertiesAndStore { success in
+                                isLoading = false
+                                if success {
+                                    navigateToProperties = true //Triggers NavigationLink
+                                }
                             }
+                        }) {
+                            Text("View Properties")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.orange)
+                                .cornerRadius(10)
+                                .padding(.top, 20)
+                                .padding(.bottom, 20)
                         }
-                    }) {
-                        Text("View Properties")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.orange)
-                            .cornerRadius(10)
-                            .padding(.top, 20)
-                            .padding(.bottom, 20)
+                        
+                        if isLoading{
+                            ProgressView()
+                        }
+                        
+                        //NavigationLink is outside the button and controlled by `navigateToProperties`
+                        NavigationLink(
+                            destination: SwipeablePropertiesView(),
+                            isActive: $navigateToProperties
+                        ) {
+                            EmptyView()  //Invisible link
+                        }
+                        
                     }
-
-                    //NavigationLink is outside the button and controlled by `navigateToProperties`
-                    NavigationLink(
-                        destination: SwipeablePropertiesView(),
-                        isActive: $navigateToProperties
-                    ) {
-                        EmptyView()  //Invisible link
-                    }
-                    
                 }
             }
         }
-       
     }
     
     func fetchPropertiesAndStore(completion: @escaping (Bool) -> Void) {
@@ -139,12 +147,16 @@ struct Homepage: View {
                     let existingUnviewedCount = snapshot?.documents.count ?? 0
                     if existingUnviewedCount >= 50 {
                         print("User already has 50 unviewed properties, skipping fetch.")
-                        completion(true)
+                        DispatchQueue.main.async{
+                            completion(true)
+                        }
                         return
                     }
                     
                     fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db)
-                    completion(true)
+                    DispatchQueue.main.async{
+                        completion(true)
+                    }
                 }
         }
     }
