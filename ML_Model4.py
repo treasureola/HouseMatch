@@ -33,6 +33,7 @@ location_encoder = LabelEncoder()
 
 # Fit the encoder on all unique location values
 locations = pd.Series([user['preferences']['location'] for user in users_list]).unique()
+print(locations)
 location_encoder.fit(locations)
 
 # Function to process user preferences and encode categorical data
@@ -42,7 +43,7 @@ def process_user_preferences(user, location_encoder):
     
     # Ensure proper encoding of location
     location_encoded = location_encoder.transform([location])[0] if location in location_encoder.classes_ else -1
-
+    print(location_encoded)
     # Return the user vector with encoded location and other features
     return np.array([
         float(preferences["maxPrice"]),
@@ -70,19 +71,18 @@ def process_property_interactions(house):
     
     # Check for NaN values in the interaction data
     if any(np.isnan(interaction_data)):
-        print(f"Warning: NaN values found in interaction data for property ID {house['property_id']}")
+        # print(f"Warning: NaN values found in interaction data for property ID {house['property_id']}")
         interaction_data = [0] * len(interaction_data)  # Replace with zero if NaN
 
     return np.array(interaction_data, dtype=float)
 
-
 # Function to check for NaN values in the data
 def check_for_nan_in_data(X_train, y_train):
     if np.any(np.isnan(X_train)):
-        print("Warning: NaN values found in feature data.")
+        # print("Warning: NaN values found in feature data.")
         print(X_train[np.isnan(X_train)])
     if np.any(np.isnan(y_train)):
-        print("Warning: NaN values found in target data.")
+        # print("Warning: NaN values found in target data.")
         print(y_train[np.isnan(y_train)])
 
 # Prepare the data for each user using user_houses
@@ -114,7 +114,6 @@ def prepare_data_for_user(user, user_houses, location_encoder):
 
 # Function to build the model
 def build_model(input_dim):
-    """Build a simple neural network for recommendations."""
     input_layer = Input(shape=(input_dim,))  # Define the input layer with the appropriate shape
     
     x = Dense(128, activation="relu")(input_layer)
@@ -125,6 +124,7 @@ def build_model(input_dim):
     
     model = Model(inputs=input_layer, outputs=output_layer)  # Create the model using the Input and output layers
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+    print("BEFORE RETURN MODEL")
     return model
 
 # Iterate through each user and train a model
@@ -133,6 +133,8 @@ for user in users_list:
     
     # Prepare the data for the current user using user_houses
     X_data, y_data = prepare_data_for_user(user, user_houses, location_encoder)
+    print("X_DATA", X_data)
+    print("Y_DATA",y_data)
     
     # Check for NaN values in the data
     check_for_nan_in_data(X_data, y_data)
@@ -146,17 +148,20 @@ for user in users_list:
     
     # Build and train the model for the current user
     model = build_model(X_train.shape[1])
-    model.fit(X_train, y_train, epochs=10, batch_size=8, verbose=1)
+    model.fit(X_train, y_train, epochs=10, batch_size=8, verbose=0)
+    # model.fit(X_train, y_train, epochs=10, batch_size=8)
     
     # Evaluate the model
+    # tf.get_logger().setLevel('ERROR')
     y_pred = model.predict(X_test)
     y_pred = (y_pred > 0.5).astype(int)  # Convert probabilities to binary predictions
 
     # Print evaluation metrics
     print(f"Accuracy for user {user['email']}: {accuracy_score(y_test, y_pred)}")
-    print(f"Mean Squared Error for user {user['email']}: {mean_squared_error(y_test, y_pred)}")
-    print(f"Mean Absolute Error for user {user['email']}: {mean_absolute_error(y_test, y_pred)}")
-    print(f"ROC AUC Score for user {user['email']}: {roc_auc_score(y_test, y_pred)}")
+    # print("AFTER ACCURACY")
+    # print(f"Mean Squared Error for user {user['email']}: {mean_squared_error(y_test, y_pred)}")
+    # print(f"Mean Absolute Error for user {user['email']}: {mean_absolute_error(y_test, y_pred)}")
+    # print(f"ROC AUC Score for user {user['email']}: {roc_auc_score(y_test, y_pred)}")
 
     # Making recommendations
     recommendations = []
