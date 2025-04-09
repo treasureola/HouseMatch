@@ -19,9 +19,9 @@ from firebase_admin import db
 from firebase_admin import firestore
 from google.cloud.firestore_v1._helpers import DatetimeWithNanoseconds
 
-# # =========================
-# # Read from DB
-# # =========================
+# =========================
+# Read from DB
+# =========================
 # def json_serial(obj):
 #     """JSON serializer for objects not serializable by default"""
 #     if isinstance(obj, DatetimeWithNanoseconds):
@@ -44,8 +44,9 @@ from google.cloud.firestore_v1._helpers import DatetimeWithNanoseconds
 # Configuration
 # =========================
 # Define file paths and constants
-DATA_PATH = "new_fake_data.json"  # Path to property data
-RECOMMENDATION_FILE = "merged_recommendations1.json"  # Output file for recommendations
+DATA_PATH = "synthetic_data.json"  # Path to property data
+# DATA_PATH = "db.json"  # Path to property data
+RECOMMENDATION_FILE = "recommendations.json"  # Output file for recommendations
 GLOBAL_MODEL_PATH = "global_model.h5"  # Path to save/load the global model
 SCALER_PATH = "scaler.npy"  # Path to save/load the scaler parameters
 
@@ -117,7 +118,7 @@ def load_property_data(filepath):
 def group_user_houses(properties_list):
     user_houses = {}
     for prop in properties_list:
-        user_id = prop.get("assigned_user_id")
+        user_id = prop.get("assignedUserID")
         if user_id:
             user_houses.setdefault(user_id, []).append(prop)  # Group by user
     return user_houses
@@ -131,6 +132,8 @@ def train_global_model(user_houses):
     X_global, y_global = [], []
 
     # Extract training data and labels from all users
+    print(1111111)
+    print("houses",user_houses)
     for houses in user_houses.values():
         for house in houses:
             X_global.append(process_property_interactions(house))
