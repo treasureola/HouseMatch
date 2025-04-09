@@ -562,10 +562,9 @@ struct FindDreamHome: View {
     @State private var property_type = "Select Property Type"
     @State private var price = "Select Price Range"
     @State private var number_Of_Bedrooms = "Select Number of Bedrooms"
-    @State private var number_Of_Bathrooms =
-    "Select Number of Bathrooms"
-    @State private var number_Of_SquareFeet =
-    "Select Number of Square Feet"
+    @State private var number_Of_Bathrooms = "Select Number of Bathrooms"
+    @State private var number_Of_SquareFeet = "Select Number of Square Feet"
+    @State private var navigateToConfirmation = false
     
     let locations =
     ["Select Location"] + [
@@ -626,8 +625,7 @@ struct FindDreamHome: View {
                     .padding(.horizontal)
                 Spacer()
                 Picker("Location", selection: $address) {
-                    ForEach(Array(Set(locations)), id: \.self) {
-                        location in
+                    ForEach(Array(Set(locations)), id: \.self) { location in
                         Text(location)
                     }
                 }
@@ -700,17 +698,16 @@ struct FindDreamHome: View {
             }
             
             HStack {
-                Text("Number of SquareFootage")
+                Text("Number of Square Footage")
                     .padding(.top, 20)
                     .padding(.horizontal)
                 Spacer()
                 Picker(
-                    "Number of SquareFootage",
+                    "Number of Square Footage",
                     selection: $number_Of_SquareFeet
                 ) {
                     ForEach(numberOfSquareFeet, id: \.self) { number in
                         Text(number)
-                        
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -721,35 +718,54 @@ struct FindDreamHome: View {
             
             //Redirects to the confirmation page
             //It takes in the user preferences from "FindDreamHome" such as (address, property_type, price,number_Of_Bedrooms,number_Of_Bathrooms, number_Of_SquareFeet)
-            NavigationLink(
-                destination: ConfirmationPage(
-                    
-                    address: address,
-                    propertyType: property_type,
-                    price: price,
-                    bedrooms: number_Of_Bedrooms,
-                    bathrooms: number_Of_Bathrooms,
-                    squareFeet: number_Of_SquareFeet
-                )
-            ) {
-                
-                Text("Thank you for designing your dream home!")
+            Button(action: {
+                if arePreferencesValid() {
+                    savePreferences()
+                    navigateToConfirmation = true
+                }
+            }) {
+                Text("Confirm Preferences")
                     .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.top, 5)
+                    .foregroundStyle(.white)
+                    .cornerRadius(10)
+                    .padding(.top, 20)
+                    .padding(.bottom, 20)
                     .background(
                         arePreferencesValid() ? Color.blue : Color.gray
                     )
                     .cornerRadius(10)
             }
-            
-            .disabled(!arePreferencesValid())  //disables the link if arePreferencesValid() is invalid
             .padding(.top, 20)
-            
-            .padding(.top, 5)
             .navigationTitle("Dream Home")
+            .background(
+                NavigationLink(
+                    destination: ConfirmationPage(
+                        address: address,
+                        propertyType: property_type,
+                        price: price,
+                        bedrooms: number_Of_Bathrooms,
+                        bathrooms: number_Of_Bedrooms,
+                        squareFeet: number_Of_SquareFeet
+                    ),
+                    isActive: $navigateToConfirmation
+                ){
+                    EmptyView()
+                }
+                .hidden()
+            )
+
+            NavigationLink(
+                destination: FindDreamHome(),
+                isActive: $navigateToConfirmation
+            ) {
+                EmptyView()
+            }
+            .hidden()
         }
+        .navigationTitle("Dream Home")
+        .padding(.top, 5)
     }
+    
     //a function to check that all the inputs aren't empty and a selection has been made
     func arePreferencesValid() -> Bool {
         return address != "Select Location"
@@ -758,6 +774,45 @@ struct FindDreamHome: View {
         && number_Of_Bedrooms != "Select Number of Bedrooms"
         && number_Of_Bathrooms != "Select Number of Bathrooms"
         && number_Of_SquareFeet != "Select Number of Square Feet"
+    }
+    
+    func savePreferences() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("Error: No authenticated user found.")
+            return
+        }
+        let (minPrice, maxPrice) = parsePriceRange(price)
+        let cleanSquareFeet = number_Of_SquareFeet.replacingOccurrences(
+            of: "+",
+            with: ""
+        )
+        let userDoc = db.collection("users").document(userID)
+        let preferences: [String: Any] = [
+            "location": address,
+            "propertyType": propertyType,
+            "minPrice": minPrice,
+            "maxPrice": maxPrice,
+            "bedrooms": number_Of_Bedrooms,
+            "bathrooms": number_Of_Bathrooms,
+            "squareFeet": cleanSquareFeet,
+            "timestamp": Timestamp(),
+        ]
+        
+        userDoc.setData(["preferences": preferences], merge: true) { error in
+            if let error = error {
+                print("Error saving preferences: \(error.localizedDescription)")
+            } else {
+                print("Preferences saved successfully")
+            }
+        }
+    }
+    
+    func parsePriceRange(_ range: String) -> (Any, Any) {
+        let numbers = range.components(
+            separatedBy: CharacterSet.decimalDigits.inverted
+        )
+            .compactMap { Int($0) }
+        return (numbers[0], numbers[1])
     }
 }
             
@@ -769,14 +824,13 @@ struct ConfirmationPage: View {
     var bedrooms: String
     var bathrooms: String
     var squareFeet: String
-    
-    let db = Firestore.firestore()
-    
-    @State private var navigateToProperties = false
+
+    @State private var navigateToHomepage = false
+    @State private var navigateBack = false
     
     var body: some View {
         VStack(alignment: .center, spacing: 20) {
-            Text("This is a Confirmation of Your Preferences")
+            Text("Confirm Preferences")
                 .font(.largeTitle)
                 .padding(.bottom, 20)
             
@@ -792,217 +846,239 @@ struct ConfirmationPage: View {
             
             Spacer()
             
-            Button(action: {
-                fetchPropertiesAndStore()
-                navigateToProperties = true  //Triggers NavigationLink
-            }) {
-                Text("View Properties")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.orange)
-                    .cornerRadius(10)
-                    .padding(.top, 20)
-                    .padding(.bottom, 20)
-            }
-
-            //NavigationLink is outside the button and controlled by `navigateToProperties`
-            NavigationLink(
-                destination: SwipeablePropertiesView(),
-                isActive: $navigateToProperties
-            ) {
-                EmptyView()  //Invisible link
+            HStack{
+                Button(action: {
+                    navigateBack = true  //Triggers navigation
+                }) {
+                    Text("Go Back")
+                        .font(.headline)
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .padding(.top, 20)
+                        .padding(.bottom, 20)
+                }
+                .background(
+                    NavigationLink(
+                        destination: FindDreamHome(),
+                        isActive: $navigateBack
+                    ){
+                        EmptyView()
+                    }
+                )
+                
+                Spacer()
+                
+                Button(action: {
+                    navigateToHomepage = true  //Triggers navigation
+                }) {
+                    Text("Confirm and Submit")
+                        .font(.headline)
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .padding(.top, 20)
+                        .padding(.bottom, 20)
+                }
+                .background(
+                    NavigationLink(
+                        destination: ConfirmationNavigation(),
+                        isActive: $navigateToHomepage
+                    ){
+                        EmptyView()
+                    }
+                )
             }
         }
-        .padding(.top, 5)
+        .padding()
         .navigationTitle("Confirmation")
     }
+}
+
+struct ConfirmationNavigation: View {
+    @State private var showToast = true
+    @State private var navigateToHomepage = false
     
-    func savePreferences() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("Error: No authenticated user found.")
-            return
-        }
-        let (minPrice, maxPrice) = parsePriceRange(price)
-        let cleanSquareFeet = squareFeet.replacingOccurrences(of: "+", with: "")
-        let userDoc = db.collection("users").document(userID)
-        let preferences: [String: Any] = [
-            "location": address,
-            "propertyType": propertyType,
-            "minPrice": minPrice,
-            "maxPrice": maxPrice,
-            "bedrooms": bedrooms,
-            "bathrooms": bathrooms,
-            "squareFeet": cleanSquareFeet,
-            "timestamp": Timestamp(),
-        ]
-        
-        userDoc.setData(["preferences": preferences], merge: true) {
-            error in
-            if let error = error {
-                print(
-                    "Error saving preferences: \(error.localizedDescription)"
-                )
-            } else {
-                print("Preferences saved successfully")
-                navigateToProperties = true
-            }
-        }
-    }
-    
-    func parsePriceRange(_ range: String) -> (Any, Any) {
-        let numbers = range.components(
-            separatedBy: CharacterSet.decimalDigits.inverted
-        )
-            .compactMap { Int($0) }
-        return (numbers[0], numbers[1])
-    }
-    
-    
-    func fetchPropertiesAndStore() {
-        print("Fetching Properties")
-        
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("Error: No authenticated user found.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userDoc = db.collection("users").document(userID)
-        
-        userDoc.getDocument { (document, error) in
-            if let error = error {
-                print("Error fetching user preferences: \(error.localizedDescription)")
-                return
-            }
+    var body: some View{
+        ZStack{
+            Homepage()
+                .opacity(navigateToHomepage ? 1 : 0)
             
-            guard let document = document, document.exists,
-                  let userPreferences = document.data()?["preferences"] as? [String: Any] else {
-                print("No preferences found for user.")
-                return
-            }
-            
-            guard let location = userPreferences["location"] as? String else {
-                print("Error: Missing or invalid user preferences.")
-                return
-            }
-            
-            let propertiesCollection = db.collection("properties")
-            propertiesCollection.whereField("assignedUserID", isEqualTo: userID)
-                .whereField("viewed", isEqualTo: false)
-                .getDocuments { (snapshot, error) in
-                    if let error = error {
-                        print("Error checking existing properties: \(error.localizedDescription)")
-                        return
-                    }
-                    
-                    let existingUnviewedCount = snapshot?.documents.count ?? 0
-                    if existingUnviewedCount >= 50 {
-                        print("User already has 50 unviewed properties, skipping fetch.")
-                        return
-                    }
-                    
-                    fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db)
+            if showToast{
+                VStack{
+                    Spacer()
+                    Text("Your preferences have been saved!")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(10)
+                    Spacer()
                 }
-        }
-    }
-    
-    func fetchFromAPI(userPreferences: [String: Any], userID: String, db: Firestore) {
-        
-        guard let location = userPreferences["location"] as? String,
-              let maxPrice = userPreferences["maxPrice"] as? Int,
-              let bedrooms = userPreferences["bedrooms"] as? String,
-              let bathrooms = userPreferences["bathrooms"] as? String else {
-            print("Error: Missing or invalid user preferences.")
-            return
-        }
-        
-    
-        // Format query parameters based on user preferences
-        let formattedLocation = location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? location
-        let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&resultsPerPage=100&sortBy=best_match"
-
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("41074491b8msh897384f5dfbdfd4p122b3cjsn3bf3b6b434f6", forHTTPHeaderField: "x-rapidapi-key")
-        request.setValue("realtor-search.p.rapidapi.com", forHTTPHeaderField: "x-rapidapi-host")
-
-        let session = URLSession.shared
-        let dataTask = session.dataTask(with: request) { (data, response, error) in
-            if let error = error {
-                print("Error fetching properties: \(error.localizedDescription)")
-                return
-            }
-
-            guard let data = data else {
-                print("No data received")
-                return
-            }
-
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                guard let results = json?["data"] as? [String: Any],
-                      let properties = results["results"] as? [[String: Any]] else {
-                    print("Invalid response format")
-                    return
-                }
-
-                let db = Firestore.firestore()
-                let propertiesCollection = db.collection("properties")
-
-                for property in properties {
-
-                    let categories = ((property["details"] as? [[String: Any]])?.compactMap { $0["text"] as? [String] }.flatMap { $0 }) ?? []
-                    let sanitizedCategories = categories.map { $0.replacingOccurrences(of: "/", with: "-") }
-                    
-                    let amenitiesArray = ((property["details"] as? [[String: Any]])?
-                        .compactMap { $0["text"] as? [String] }
-                        .flatMap { $0 }
-                    ) ?? []
-
-
-                    let propertyData: [String: Any] = [
-                        "property_id": property["property_id"] as? String ?? "",
-                        "listing_id": property["listing_id"] ?? "",
-                        "status": property["status"] ?? "Unknown",
-                        "photo_url": (property["primary_photo"] as? [String: Any])?["href"] ?? "",
-                        "address": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["line"] as? String ?? "",
-                        "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
-                        "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
-                        "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
-                        "price": property["list_price_max"] ?? 0,
-                        "bedrooms": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
-                        "bathrooms": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
-                        "square_feet": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,
-                        "listing_url": property["href"] ?? "",
-                        "amenities": amenitiesArray,
-                        "petFriendly": property["pet_policy.cats"] as? Bool == true || property["pet_policy.dogs"] as? Bool == true,
-                        "assignedUserID": userID,
-                        "viewed": false
-                    ]
-
-                    // Saves the property data to Firestore
-                    propertiesCollection.addDocument(data: propertyData) { error in
-                        if let error = error {
-                            print("Error saving property to Firestore: \(error.localizedDescription)")
-                        } else {
-                            print("Property successfully saved!")
+                .transition(.move(edge: .bottom))
+                .onAppear{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+                        withAnimation{
+                            showToast = false
+                            navigateToHomepage = true
                         }
                     }
                 }
-            } catch {
-                print("Error parsing JSON: \(error.localizedDescription)")
             }
         }
-
-        dataTask.resume()
+        .navigationBarBackButtonHidden(true)
     }
 }
+    
+//    
+//    func fetchPropertiesAndStore() {
+//        print("Fetching Properties")
+//        
+//        guard let userID = Auth.auth().currentUser?.uid else {
+//            print("Error: No authenticated user found.")
+//            return
+//        }
+//        
+//        let db = Firestore.firestore()
+//        let userDoc = db.collection("users").document(userID)
+//        
+//        userDoc.getDocument { (document, error) in
+//            if let error = error {
+//                print("Error fetching user preferences: \(error.localizedDescription)")
+//                return
+//            }
+//            
+//            guard let document = document, document.exists,
+//                  let userPreferences = document.data()?["preferences"] as? [String: Any] else {
+//                print("No preferences found for user.")
+//                return
+//            }
+//            
+//            guard let location = userPreferences["location"] as? String else {
+//                print("Error: Missing or invalid user preferences.")
+//                return
+//            }
+//            
+//            let propertiesCollection = db.collection("properties")
+//            propertiesCollection.whereField("assignedUserID", isEqualTo: userID)
+//                .whereField("viewed", isEqualTo: false)
+//                .getDocuments { (snapshot, error) in
+//                    if let error = error {
+//                        print("Error checking existing properties: \(error.localizedDescription)")
+//                        return
+//                    }
+//                    
+//                    let existingUnviewedCount = snapshot?.documents.count ?? 0
+//                    if existingUnviewedCount >= 50 {
+//                        print("User already has 50 unviewed properties, skipping fetch.")
+//                        return
+//                    }
+//                    
+//                    fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db)
+//                }
+//        }
+//    }
+//    
+//    func fetchFromAPI(userPreferences: [String: Any], userID: String, db: Firestore) {
+//        
+//        guard let location = userPreferences["location"] as? String,
+//              let maxPrice = userPreferences["maxPrice"] as? Int,
+//              let bedrooms = userPreferences["bedrooms"] as? String,
+//              let bathrooms = userPreferences["bathrooms"] as? String else {
+//            print("Error: Missing or invalid user preferences.")
+//            return
+//        }
+//        
+//    
+//        // Format query parameters based on user preferences
+//        let formattedLocation = location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? location
+//        let urlString = "https://realtor-search.p.rapidapi.com/properties/search-rent?location=city:\(formattedLocation)&price_max=\(maxPrice)&beds_min=\(bedrooms)&baths_min=\(bathrooms)&resultsPerPage=100&sortBy=best_match"
+//
+//        guard let url = URL(string: urlString) else {
+//            print("Invalid URL")
+//            return
+//        }
+//
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//        request.setValue("41074491b8msh897384f5dfbdfd4p122b3cjsn3bf3b6b434f6", forHTTPHeaderField: "x-rapidapi-key")
+//        request.setValue("realtor-search.p.rapidapi.com", forHTTPHeaderField: "x-rapidapi-host")
+//
+//        let session = URLSession.shared
+//        let dataTask = session.dataTask(with: request) { (data, response, error) in
+//            if let error = error {
+//                print("Error fetching properties: \(error.localizedDescription)")
+//                return
+//            }
+//
+//            guard let data = data else {
+//                print("No data received")
+//                return
+//            }
+//
+//            do {
+//                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+//                guard let results = json?["data"] as? [String: Any],
+//                      let properties = results["results"] as? [[String: Any]] else {
+//                    print("Invalid response format")
+//                    return
+//                }
+//
+//                let db = Firestore.firestore()
+//                let propertiesCollection = db.collection("properties")
+//
+//                for property in properties {
+//
+//                    let categories = ((property["details"] as? [[String: Any]])?.compactMap { $0["text"] as? [String] }.flatMap { $0 }) ?? []
+//                    let sanitizedCategories = categories.map { $0.replacingOccurrences(of: "/", with: "-") }
+//                    
+//                    let amenitiesArray = ((property["details"] as? [[String: Any]])?
+//                        .compactMap { $0["text"] as? [String] }
+//                        .flatMap { $0 }
+//                    ) ?? []
+//
+//
+//                    let propertyData: [String: Any] = [
+//                        "property_id": property["property_id"] as? String ?? "",
+//                        "listing_id": property["listing_id"] ?? "",
+//                        "status": property["status"] ?? "Unknown",
+//                        "photo_url": (property["primary_photo"] as? [String: Any])?["href"] ?? "",
+//                        "address": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["line"] as? String ?? "",
+//                        "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
+//                        "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
+//                        "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
+//                        "price": property["list_price_max"] ?? 0,
+//                        "bedrooms": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
+//                        "bathrooms": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
+//                        "square_feet": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,
+//                        "listing_url": property["href"] ?? "",
+//                        "amenities": amenitiesArray,
+//                        "petFriendly": property["pet_policy.cats"] as? Bool == true || property["pet_policy.dogs"] as? Bool == true,
+//                        "assignedUserID": userID,
+//                        "viewed": false
+//                    ]
+//
+//                    // Saves the property data to Firestore
+//                    propertiesCollection.addDocument(data: propertyData) { error in
+//                        if let error = error {
+//                            print("Error saving property to Firestore: \(error.localizedDescription)")
+//                        } else {
+//                            print("Property successfully saved!")
+//                        }
+//                    }
+//                }
+//            } catch {
+//                print("Error parsing JSON: \(error.localizedDescription)")
+//            }
+//        }
+//
+//        dataTask.resume()
+//    }
+
 
 struct ThankYouPage: View {
     var body: some View {
@@ -1082,7 +1158,7 @@ struct ThankYouPage: View {
 //                    }
 //                }
                 
-                #Preview {
-                    WelcomeView()
-                }
+            #Preview {
+                WelcomeView()
+            }
 

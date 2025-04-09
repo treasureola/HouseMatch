@@ -26,7 +26,6 @@ struct Homepage: View {
         NavigationStack{
             ZStack{
                 Color.purple
-                //                .edgesIgnoringSafeArea(.all)
                 VStack{
                     VStack{
                         Text("About Us")
@@ -38,21 +37,14 @@ struct Homepage: View {
                         
                         
                         
-                        Text("We are an AI-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
+                        Text("Discover apartments and houses tailored for you! Hit the button to find your match!")
                             .font(.body)
-                        
                             .padding(.horizontal)
                             .multilineTextAlignment(.center)
                             .transition(.opacity)
                             .padding(.top, 40)
                         
-                        //
                         Spacer()
-                        //
-                        
-                        //                        Image(systemName: "house.fill")
-                        //                            .foregroundColor(.white)
-                        //                            .font(.system(size: 90))
                         
                         
                         Image(.houseA)  //HouseMatch logo
@@ -68,9 +60,13 @@ struct Homepage: View {
                         Button(action: {
                             isLoading = true
                             fetchPropertiesAndStore { success in
-                                isLoading = false
-                                if success {
-                                    navigateToProperties = true //Triggers NavigationLink
+                                DispatchQueue.main.async{
+                                    isLoading = false
+                                    if success {
+                                        navigateToProperties = true //Triggers NavigationLink
+                                    } else {
+                                        print("Failed to fetch properties")
+                                    }
                                 }
                             }
                         }) {
@@ -85,7 +81,9 @@ struct Homepage: View {
                         }
                         
                         if isLoading{
-                            ProgressView()
+                            ProgressView("Fetching Properties...")
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .padding(.top, 10)
                         }
                         
                         //NavigationLink is outside the button and controlled by `navigateToProperties`
@@ -137,6 +135,7 @@ struct Homepage: View {
             let propertiesCollection = db.collection("properties")
             propertiesCollection.whereField("assignedUserID", isEqualTo: userID)
                 .whereField("viewed", isEqualTo: false)
+                .whereField("city", isEqualTo: location)
                 .getDocuments { (snapshot, error) in
                     if let error = error {
                         print("Error checking existing properties: \(error.localizedDescription)")
@@ -153,21 +152,21 @@ struct Homepage: View {
                         return
                     }
                     
-                    fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db)
-                    DispatchQueue.main.async{
-                        completion(true)
+                    fetchFromAPI(userPreferences: userPreferences, userID: userID, db: db) { success in
+                        completion(success)
                     }
                 }
         }
     }
     
-    func fetchFromAPI(userPreferences: [String: Any], userID: String, db: Firestore) {
+    func fetchFromAPI(userPreferences: [String: Any], userID: String, db: Firestore, completion: @escaping (Bool) -> Void) {
         
         guard let location = userPreferences["location"] as? String,
               let maxPrice = userPreferences["maxPrice"] as? Int,
               let bedrooms = userPreferences["bedrooms"] as? String,
               let bathrooms = userPreferences["bathrooms"] as? String else {
             print("Error: Missing or invalid user preferences.")
+            completion(false)
             return
         }
         
@@ -178,6 +177,7 @@ struct Homepage: View {
 
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
+            completion(false)
             return
         }
 
@@ -189,12 +189,14 @@ struct Homepage: View {
         let session = URLSession.shared
         let dataTask = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
-                print("Error fetching properties: \(error.localizedDescription)")
+                print("Error fetching properties from API: \(error.localizedDescription)")
+                completion(false)
                 return
             }
 
             guard let data = data else {
-                print("No data received")
+                print("No data received from API")
+                completion(false)
                 return
             }
 
@@ -202,22 +204,95 @@ struct Homepage: View {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 guard let results = json?["data"] as? [String: Any],
                       let properties = results["results"] as? [[String: Any]] else {
-                    print("Invalid response format")
+                    print("Invalid response format from API")
+                    completion(false)
+                    return
+                }
+                
+                if properties.isEmpty {
+                    print("No new properties found matching criteria from API")
+                    completion(true)
                     return
                 }
 
+                let group = DispatchGroup()
                 let db = Firestore.firestore()
                 let propertiesCollection = db.collection("properties")
 
                 for property in properties {
-
-                    let categories = ((property["details"] as? [[String: Any]])?.compactMap { $0["text"] as? [String] }.flatMap { $0 }) ?? []
-                    let sanitizedCategories = categories.map { $0.replacingOccurrences(of: "/", with: "-") }
                     
+                    group.enter()
+
+//                    let categories = ((property["details"] as? [[String: Any]])?.compactMap { $0["text"] as? [String] }.flatMap { $0 }) ?? []
+//                    let sanitizedCategories = categories.map { $0.replacingOccurrences(of: "/", with: "-") }
+//                    
+//                    let amenitiesArray = ((property["details"] as? [[String: Any]])?
+//                        .compactMap { $0["text"] as? [String] }
+//                        .flatMap { $0 }
+//                    ) ?? []
+                    
+                    
+                    let priceValue: Int
+                    if let priceAny = property["list_price_max"] {
+                        if let priceInt = priceAny as? Int {
+                            priceValue = priceInt
+                        } else if let priceDouble = priceAny as? Double {
+                            priceValue = Int(priceDouble) // Convert Double to Int if necessary
+                        } else {
+                            priceValue = 0 // Default price
+                        }
+                    } else {
+                        priceValue = 0 // Default price
+                    }
+
+                    let bedsValue: Int
+                     if let bedsAny = (property["description"] as? [String: Any])?["beds_max"] {
+                         if let bedsInt = bedsAny as? Int {
+                             bedsValue = bedsInt
+                         } else if let bedsDouble = bedsAny as? Double {
+                            bedsValue = Int(bedsDouble)
+                         } else {
+                             bedsValue = 0
+                         }
+                     } else {
+                         bedsValue = 0
+                     }
+
+                    let bathsValue: Int
+                     if let bathsAny = (property["description"] as? [String: Any])?["baths_max"] {
+                         if let bathsInt = bathsAny as? Int {
+                            bathsValue = bathsInt
+                         } else if let bathsDouble = bathsAny as? Double {
+                            bathsValue = Int(bathsDouble)
+                         } else {
+                             bathsValue = 0
+                         }
+                     } else {
+                         bathsValue = 0
+                     }
+
+                    let sqftValue: Int
+                     if let sqftAny = (property["description"] as? [String: Any])?["sqft_max"] {
+                         if let sqftInt = sqftAny as? Int {
+                            sqftValue = sqftInt
+                         } else if let sqftDouble = sqftAny as? Double {
+                             sqftValue = Int(sqftDouble)
+                         } else {
+                             sqftValue = 0
+                         }
+                     } else {
+                         sqftValue = 0
+                     }
+
                     let amenitiesArray = ((property["details"] as? [[String: Any]])?
                         .compactMap { $0["text"] as? [String] }
                         .flatMap { $0 }
                     ) ?? []
+
+                     let petPolicy = property["pet_policy"] as? [String: Any]
+                     let catsAllowed = petPolicy?["cats"] as? Bool ?? false
+                     let dogsAllowed = petPolicy?["dogs"] as? Bool ?? false
+
 
 
                     let propertyData: [String: Any] = [
@@ -229,13 +304,13 @@ struct Homepage: View {
                         "city": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["city"] ?? "",
                         "state_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["state_code"] ?? "",
                         "postal_code": ((property["location"] as? [String: Any])?["address"] as? [String: Any])?["postal_code"] ?? "",
-                        "price": property["list_price_max"] ?? 0,
-                        "bedrooms": (property["description"] as? [String: Any])?["beds_max"] ?? 0,
-                        "bathrooms": (property["description"] as? [String: Any])?["baths_max"] ?? 0,
-                        "square_feet": (property["description"] as? [String: Any])?["sqft_max"] ?? 0,
+                        "price": priceValue,
+                        "bedrooms": bedsValue,
+                        "bathrooms": bathsValue,
+                        "square_feet": sqftValue,
                         "listing_url": property["href"] ?? "",
                         "amenities": amenitiesArray,
-                        "petFriendly": property["pet_policy.cats"] as? Bool == true || property["pet_policy.dogs"] as? Bool == true,
+                        "petFriendly": catsAllowed || dogsAllowed,
                         "assignedUserID": userID,
                         "viewed": false
                     ]
@@ -247,13 +322,18 @@ struct Homepage: View {
                         } else {
                             print("Property successfully saved!")
                         }
+                        group.leave()
                     }
+                }
+                group.notify(queue: .main){
+                    print("All properties saved!")
+                    completion(true)
                 }
             } catch {
                 print("Error parsing JSON: \(error.localizedDescription)")
+                completion(false)
             }
         }
-
         dataTask.resume()
     }
 }
