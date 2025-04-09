@@ -432,6 +432,7 @@ def generate_weighted_recommendations(properties_list, user_houses, model, scale
 
         # Sort recommendations based on the merged weighted score
         recommendations[user_id] = dict(sorted(merged_recommendations.items(), key=lambda x: x[1], reverse=True)[:10])
+        print("\n")
 
     return recommendations
 
