@@ -312,7 +312,14 @@ struct Homepage: View {
                         "amenities": amenitiesArray,
                         "petFriendly": catsAllowed || dogsAllowed,
                         "assignedUserID": userID,
-                        "viewed": false
+                        "viewed": false,
+                        "clicks": false,
+                        "entry_timestamp": FieldValue.serverTimestamp(),
+                        "exit_timestamp": FieldValue.serverTimestamp(),
+                        "timestamp": FieldValue.serverTimestamp(),
+                        "favorited": false,
+                        "rating": 0,
+                        "total_time": 0
                     ]
 
                     // Saves the property data to Firestore

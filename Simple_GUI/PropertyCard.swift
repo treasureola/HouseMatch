@@ -27,6 +27,7 @@ struct PropertyCard: View {
     @State private var totalViewTime: TimeInterval = 0
     @State private var clicked = false
     @State private var isFavorited = false
+    @State private var showSaveToast = false
     
     var isActive: Bool{
         return activePropertyID == property.id
@@ -141,7 +142,9 @@ struct PropertyCard: View {
                 DragGesture()
                     .onChanged { gesture in
                         self.offset = gesture.translation
-                        self.color = offset.width > 0 ? .green : .red
+                        withAnimation(.spring()){
+                            self.color = offset.width > 0 ? .green.opacity(0.6) : .red.opacity(0.6)
+                        }
                     }
                     .onEnded { _ in
                         if abs(offset.width) > 150 {
@@ -150,7 +153,14 @@ struct PropertyCard: View {
                             storeInteraction()
                             
                             markPropertyAsViewed(property)
-                            saveLikedProperty(property)
+                            
+                            if offset.width > 150 {
+                                saveLikedProperty(property)
+                                showSaveToast = true
+                            } else {
+                                
+                            }
+                            
                             onRemove?() // Remove the card if swiped far enough
                             activePropertyID = nil
                         } else {
@@ -159,8 +169,35 @@ struct PropertyCard: View {
                                 color = .white
                             }
                         }
-                    }
+                 }
             )
+            .onChange(of: isActive) { newValue in
+                if newValue { entryTimestamp = Date() }
+                else {
+                    if exitTimestamp == nil{
+                        exitTimestamp = Date()
+                        calculateTotalViewTime()
+                        storeInteraction()
+                    }
+                }
+            }
+            
+            if showSaveToast {
+                Text("Saved to your profile!")
+                    .padding()
+                    .background(Color.black.opacity(0.7))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            withAnimation {
+                                showSaveToast = false
+                            }
+                        }
+                    }
+                    .zIndex(1)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
