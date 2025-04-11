@@ -18,7 +18,7 @@ struct SwipeablePropertiesView: View {
     var body: some View {
         ZStack {
             if viewModel.properties.isEmpty {
-                Text("No properties available")
+                Text("Loading...")
                     .font(.headline)
                     .padding()
             } else {

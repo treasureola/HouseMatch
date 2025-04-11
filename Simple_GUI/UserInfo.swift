@@ -21,10 +21,12 @@ class UserInfo: ObservableObject {
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var email: String = ""
+    @Published var hasPreferences: Bool = false
     
     func clear(){
         firstName = ""
         lastName = ""
         email = ""
+        hasPreferences = false
     }
 }

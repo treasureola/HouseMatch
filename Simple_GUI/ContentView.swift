@@ -80,7 +80,7 @@ struct LoginScreenView: View {
     
     var body: some View {
         VStack {
-            Text("Welcome back!")  //this displays "Welcome back with the user's first name
+            Text("Welcome!")  //this displays "Welcome back with the user's first name
                 .font(.largeTitle)
                 .bold()
             
@@ -141,7 +141,6 @@ struct LoginScreenView: View {
                 }
                 .padding(.top, 20)
             }
-            .navigationTitle("Login")
         }
     }
     
@@ -206,6 +205,7 @@ struct SignUpView: View {
     @State private var passwordError = ""
     @State private var confirmPasswordError = ""
     @State private var isLoading = false
+    @State private var navigateToLogin = false
     
     //firebase instance
     let db = Firestore.firestore()
@@ -291,6 +291,10 @@ struct SignUpView: View {
             .disabled(!canAttemptSignUp() || isLoading)
             .padding(.horizontal)
             .padding(.bottom)
+            
+            NavigationLink(destination: LoginScreenView(), isActive: $navigateToLogin){
+                EmptyView()
+            }
             
             if isLoading{
                 ProgressView()
@@ -388,9 +392,21 @@ struct SignUpView: View {
             isLoading = false
             if let error = error {
                 print("Error creating user: \(error.localizedDescription)")
+                generalError = error.localizedDescription
             } else if let user = authResult?.user {
                 print("User created successfully! UID: \(user.uid)")
                 saveUserData(uid: user.uid)
+                
+                UserDefaults.standard.set(true, forKey: "showLogin")
+                
+                do{
+                    try Auth.auth().signOut()
+                    print("user signned out")
+                } catch let signOutError {
+                    print("Sign out error: \(signOutError.localizedDescription)")
+                }
+                
+                navigateToLogin = true
             } else{
                 generalError = "An error occurred while creating your account."
             }
@@ -565,6 +581,8 @@ struct FindDreamHome: View {
     @State private var number_Of_Bathrooms = "Select Number of Bathrooms"
     @State private var number_Of_SquareFeet = "Select Number of Square Feet"
     @State private var navigateToConfirmation = false
+    
+    @EnvironmentObject var userInfo: UserInfo
     
     let locations =
     ["Select Location"] + [
@@ -753,14 +771,6 @@ struct FindDreamHome: View {
                 }
                 .hidden()
             )
-
-            NavigationLink(
-                destination: FindDreamHome(),
-                isActive: $navigateToConfirmation
-            ) {
-                EmptyView()
-            }
-            .hidden()
         }
         .navigationTitle("Dream Home")
         .padding(.top, 5)
@@ -803,6 +813,9 @@ struct FindDreamHome: View {
                 print("Error saving preferences: \(error.localizedDescription)")
             } else {
                 print("Preferences saved successfully")
+                DispatchQueue.main.async {
+                    userInfo.hasPreferences = true
+                }
             }
         }
     }
@@ -824,6 +837,8 @@ struct ConfirmationPage: View {
     var bedrooms: String
     var bathrooms: String
     var squareFeet: String
+    
+    @Environment(\.dismiss) var dismiss
 
     @State private var navigateToHomepage = false
     @State private var navigateBack = false

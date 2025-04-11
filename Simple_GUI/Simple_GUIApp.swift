@@ -20,46 +20,12 @@ struct Simple_GUIApp: App {
     
     var body: some Scene {
         WindowGroup {
-            Group{
-                if isLoggedIn{
-                    MainTabView()
-                } else{
-                    WelcomeView()
-                }
-            }
-            .environmentObject(userInfo)
-            .onAppear{
-                //listen for change in suthetication state
-                Auth.auth().addStateDidChangeListener { auth, user in
-                    DispatchQueue.main.async{
-                        self.isLoggedIn = (user != nil)
-                    }
-                    if let user = user {
-                        fetchFirestoreUserInfo(uid: user.uid)
-                    } else{
-                        userInfo.clear()
-                    }
-                }
-            }
+            AppEntryView()
+                .environmentObject(userInfo)
         }
     }
     
-    func fetchFirestoreUserInfo(uid: String){
-        let db = Firestore.firestore()
-        let userDoc = db.collection("users").document(uid)
-        userDoc.getDocument { (document, error) in
-            if let document = document, document.exists, let userData = document.data() {
-                DispatchQueue.main.async{
-                    userInfo.firstName = userData["first_name"] as? String ?? ""
-                    userInfo.lastName = userData["last_name"] as? String ?? ""
-                    userInfo.email = userData["email"] as? String ?? ""
-                    print("User fetched correctly")
-                }
-            } else {
-                print ("User does not exist")
-            }
-        }
-    }
+
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
