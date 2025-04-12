@@ -33,7 +33,17 @@ final class UserPreference: Model, Content {
 
     init() {}
 
-    init(id: UUID? = nil, userID: UUID, location: String, propertyType: String, minPrice: Int, maxPrice: Int, bedrooms: Int, bathrooms: Int, squareFeet: Int) {
+    init(
+        id: UUID? = nil,
+        userID: UUID,
+        location: String,
+        propertyType: String,
+        minPrice: Int,
+        maxPrice: Int,
+        bedrooms: Int,
+        bathrooms: Int,
+        squareFeet: Int
+    ) {
         self.id = id
         self.$user.id = userID
         self.location = location
@@ -44,7 +54,18 @@ final class UserPreference: Model, Content {
         self.bathrooms = bathrooms
         self.squareFeet = squareFeet
     }
+
+    func update(from input: UserPreference) {
+        self.location = input.location
+        self.propertyType = input.propertyType
+        self.minPrice = input.minPrice
+        self.maxPrice = input.maxPrice
+        self.bedrooms = input.bedrooms
+        self.bathrooms = input.bathrooms
+        self.squareFeet = input.squareFeet
+    }
 }
 
-//  Apply @unchecked Sendable using an extension
+// Allow safe usage in async contexts
 extension UserPreference: @unchecked Sendable {}
+ 

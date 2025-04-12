@@ -26,3 +26,21 @@ struct AddSquareFeetToProperty: Migration {
             .update()
     }
 }
+
+struct CreateProperty: AsyncMigration {
+    func prepare(on database: Database) async throws {
+        try await database.schema("properties")
+            .id()
+            .field("city", .string, .required)
+            .field("property_type", .string, .required)
+            .field("price", .int, .required)
+            .field("bedrooms", .int, .required)
+            .field("bathrooms", .int, .required)
+            .field("square_feet", .int, .required)
+            .create()
+    }
+
+    func revert(on database: Database) async throws {
+        try await database.schema("properties").delete()
+    }
+}
