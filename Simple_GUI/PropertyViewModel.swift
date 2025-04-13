@@ -13,28 +13,40 @@ import SwiftUI
 
 class PropertyViewModel: ObservableObject {
     @Published var properties: [Property] = []
+    @Published var isLoading = true
+    @Published var fetchErrorMessage: String? = nil
 
     func fetchProperties() {
-        print("We are fetching properties")
+        print("Attempting to fetch properties..")
+        self.isLoading = true
+        self.fetchErrorMessage = nil
+        self.properties = []
         guard let userID = Auth.auth().currentUser?.uid else {
             print("No authenticated user found.")
+            self.isLoading = false
+            self.fetchErrorMessage = "Not logged in."
             return
         }
+        print("User authenticated")
         
         let db = Firestore.firestore()
         
         print("Database connected")
+        
         db.collection("users").document(userID)
             .getDocument{ (document, error) in
                 if let error = error {
                     print("Error fetching user preferences: \(error.localizedDescription)")
+                    self.isLoading = false
+                    self.fetchErrorMessage = "Error fetching preferences."
                     return
                 }
                 
                 guard let document = document, document.exists,
                       let userPreferences = document.data()?["preferences"] as? [String: Any],
                       let location = userPreferences["location"] as? String else {
-                    print("No preferences found for user.")
+                    print("No preferences or location found for user.")
+                    self.isLoading = false
                     return
                 }
                 
@@ -46,10 +58,14 @@ class PropertyViewModel: ObservableObject {
                     .whereField("viewed", isEqualTo: false)
                     .whereField("city", isEqualTo: location)
 //                    .order(by: "recommendation_score", descending: true)
-                    .limit(to: 25)
+                    .limit(to: 50)
                     .getDocuments { (snapshot, error) in
                     if let error = error {
                         print("Error fetching properties: \(error.localizedDescription)")
+                        DispatchQueue.main.async {
+                            self.isLoading = false
+                            self.fetchErrorMessage = "Error loading properties."
+                        }
                         return
                     }
 

@@ -38,15 +38,15 @@ struct PropertyCard: View {
             color.edgesIgnoringSafeArea(.all)
             
             ScrollView{
-                VStack {
+                VStack () {
                     if let imageUrl = URL(string: property.imageUrl) {
                         AsyncImage(url: imageUrl) { image in
-                            image.resizable()
+                            image.resizable().scaledToFill()
                         } placeholder: {
                             ProgressView()
                         }
-                        .frame(height: 300)
-                        .cornerRadius(15)
+                        .frame(height: 250)
+                        .cornerRadius(20)
                         .clipped()
                     }
                     
@@ -64,9 +64,23 @@ struct PropertyCard: View {
                         .padding(.top, 5)
                         .bold()
                     
-                    Text("\(property.bedrooms) Beds • \(property.bathrooms) Baths • \(property.squareFeet) sqft")
-                        .font(.subheadline)
-                        .padding(.vertical, 5)
+                    HStack(spacing: 15) {
+                        Label(
+                            "\(property.bedrooms)",
+                            systemImage: "bed.double.fill"
+                        )
+                        Label(
+                            "\(property.bathrooms)",
+                            systemImage: "shower"
+                        )
+                        Label(
+                            "\(property.squareFeet) sqft",
+                            systemImage: "ruler.fill"
+                        )
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .padding(.top, 5)
                     
                     if property.petFriendly {
                         Text("🐾 Pet-Friendly")
@@ -76,20 +90,25 @@ struct PropertyCard: View {
                     
                     Divider().padding(.vertical, 5)
                     
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .center) {
                         Text("Amenities:")
                             .font(.headline)
                             .padding(.top, 5)
+                            .padding(.bottom, 5)
                         
                         if property.amenities.isEmpty {
                             Text("No amenities listed")
                                 .font(.footnote)
                                 .foregroundColor(.gray)
                         } else {
-                            ForEach(property.amenities, id: \.self) { amenity in
-                                Text("• \(amenity)")
+                            let uniqueAmenities = Array(Set(property.amenities))
+                            ForEach(uniqueAmenities, id: \.self) { amenity in
+//                                Text("• \(amenity)")
+                                Text("\(amenity)")
                                     .font(.footnote)
                                     .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.bottom, 2)
                             }
                         }
                     }
@@ -105,7 +124,7 @@ struct PropertyCard: View {
                             storeInteraction()
                             UIApplication.shared.open(url)
                         }){
-                            Text("View Listing")
+                            Text("View Full Listing")
                                 .foregroundColor(.blue)
                                 .padding()
                         }
@@ -122,7 +141,14 @@ struct PropertyCard: View {
                     }
                 }
                 .padding()
-                .frame(maxWidth: .infinity)
+                .frame(width: UIScreen.main.bounds.width * 0.95)
+                .background(
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(color)
+                        .shadow(color: Color.gray.opacity(0.3), radius: 2, x: 0, y: 5)
+                )
+//                .cornerRadius(20)
+                .shadow(radius: 2)
                 .onChange(of: isActive){ newValue in
                     if newValue {
                         entryTimestamp = Date()
@@ -133,10 +159,14 @@ struct PropertyCard: View {
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(color)
-            .cornerRadius(15)
-            .shadow(radius: 5)
+            .frame(width: UIScreen.main.bounds.width * 0.95)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(color)
+                    .shadow(color: Color.gray.opacity(0.3), radius: 2, x: 0, y: 5)
+            )
+//            .cornerRadius(20)
+            .shadow(radius: 2)
             .offset(offset)
             .gesture(
                 DragGesture()
@@ -157,12 +187,15 @@ struct PropertyCard: View {
                             if offset.width > 150 {
                                 saveLikedProperty(property)
                                 showSaveToast = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5){
+                                    onRemove?() // Remove the card if swiped far enough
+                                    activePropertyID = nil
+                                }
                             } else {
-                                
+                                onRemove?() // Remove the card if swiped far enough
+                                activePropertyID = nil
                             }
                             
-                            onRemove?() // Remove the card if swiped far enough
-                            activePropertyID = nil
                         } else {
                             withAnimation {
                                 offset = .zero
