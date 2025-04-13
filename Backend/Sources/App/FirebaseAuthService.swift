@@ -7,6 +7,8 @@
 
 import Vapor
 import Foundation
+import FoundationNetworking
+
 
 
 struct FirebaseAuthService {
