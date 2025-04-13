@@ -6,6 +6,8 @@
 //
 
 import Vapor
+import Foundation
+
 
 struct FirebaseAuthService {
     static func verifyToken(_ token: String) async throws -> FirebaseUser {
