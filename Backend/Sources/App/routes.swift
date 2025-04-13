@@ -13,7 +13,9 @@ func routes(_ app: Application) throws {
     // MARK: - User Registration
     app.post("register") { req async throws -> HTTPStatus in
         let input = try req.content.decode(RegisterInput.self)
-
+                          
+        print("Register route called with email: \(input.email)")
+                          
         if let _ = try await User.query(on: req.db)
             .filter(\.$email == input.email)
             .first() {
