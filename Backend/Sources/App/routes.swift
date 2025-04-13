@@ -13,9 +13,7 @@ func routes(_ app: Application) throws {
     // MARK: - User Registration
     app.post("register") { req async throws -> HTTPStatus in
         let input = try req.content.decode(RegisterInput.self)
-                          
-        print("Register route called with email: \(input.email)")
-                          
+
         if let _ = try await User.query(on: req.db)
             .filter(\.$email == input.email)
             .first() {
@@ -30,12 +28,32 @@ func routes(_ app: Application) throws {
         try await user.save(on: req.db)
         return .ok
     }
+    
+    app.post("login") { req async throws -> TokenResponse in
+        let input = try req.content.decode(UserInput.self)
+
+        guard let token = input.token, !token.isEmpty else {
+            throw Abort(.unauthorized, reason: "Missing Firebase token")
+        }
+
+        let verified = try await FirebaseAuthService.verifyToken(token)
+
+        guard let user = try await User.query(on: req.db)
+            .filter(\.$email == verified.email)
+            .first() else {
+            throw Abort(.unauthorized, reason: "User not found. Please register first.")
+        }
+
+        print("Login successful for: \(user.email)")
+        return TokenResponse(token: token)
+    }
 
     // MARK: - User Preferences (Save & Get)
     protected.group("preferences") { preferences in
         preferences.get { req async throws -> UserPreference in
             let user = try req.auth.require(User.self)
-
+            let input = try req.content.decode(UserPreference.self)
+            
             guard let preference = try await UserPreference.query(on: req.db)
                 .filter(\.$user.$id == user.requireID())
                 .first() else {
