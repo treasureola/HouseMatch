@@ -15,6 +15,7 @@ class PropertyViewModel: ObservableObject {
     @Published var properties: [Property] = []
     @Published var isLoading = true
     @Published var fetchErrorMessage: String? = nil
+    @Published var didRetry = false
 
     func fetchProperties() {
         print("Attempting to fetch properties..")
@@ -45,10 +46,10 @@ class PropertyViewModel: ObservableObject {
                 guard let document = document, document.exists,
                       let userPreferences = document.data()?["preferences"] as? [String: Any],
                       let location = userPreferences["location"] as? String else {
-                    print("No preferences or location found for user.")
-                    self.isLoading = false
-                    return
-                }
+                            print("No preferences or location found for user.")
+                            self.isLoading = false
+                            return
+                        }
                 
 //                //call EC2 instance
 //                self.triggerEC2(userID: userID)
@@ -58,7 +59,7 @@ class PropertyViewModel: ObservableObject {
                     .whereField("viewed", isEqualTo: false)
                     .whereField("city", isEqualTo: location)
 //                    .order(by: "recommendation_score", descending: true)
-                    .limit(to: 50)
+                    .limit(to: 100)
                     .getDocuments { (snapshot, error) in
                     if let error = error {
                         print("Error fetching properties: \(error.localizedDescription)")
@@ -93,11 +94,17 @@ class PropertyViewModel: ObservableObject {
                             )
                         } ?? []
                         
+                        if self.properties.isEmpty && !self.didRetry{
+                            self.didRetry = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                print("Retrying fetch")
+                                self.fetchProperties()
+                            }
+                        } else{
+                            self.isLoading = false
+                        }
                     }
                 }
             }
     }
-    
-
-
 }
