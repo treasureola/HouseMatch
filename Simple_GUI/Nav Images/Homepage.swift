@@ -144,8 +144,8 @@ struct Homepage: View {
                     }
                     
                     let existingUnviewedCount = snapshot?.documents.count ?? 0
-                    if existingUnviewedCount >= 50 {
-                        print("User already has 50 unviewed properties, skipping fetch.")
+                    if existingUnviewedCount >= 100 {
+                        print("User already has 100 unviewed properties, skipping fetch.")
                         DispatchQueue.main.async{
                             completion(true)
                         }
