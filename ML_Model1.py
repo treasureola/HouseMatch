@@ -22,23 +22,23 @@ from google.cloud.firestore_v1._helpers import DatetimeWithNanoseconds
 # =========================
 # Read from DB
 # =========================
-# def json_serial(obj):
-#     """JSON serializer for objects not serializable by default"""
-#     if isinstance(obj, DatetimeWithNanoseconds):
-#         return obj.isoformat()  # Convert to string format (ISO 8601)
-#     raise TypeError(f"Type {type(obj)} not serializable")
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default"""
+    if isinstance(obj, DatetimeWithNanoseconds):
+        return obj.isoformat()  # Convert to string format (ISO 8601)
+    raise TypeError(f"Type {type(obj)} not serializable")
 
-# cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
-# firebase_admin.initialize_app(cred)
-# db = firestore.client()
-# users_ref = db.collection("properties")
-# docs = users_ref.stream()
-# existing_data = []
-# for doc in docs:
-#     db_data = doc.to_dict()
-#     existing_data.append(db_data)
-# with open("db.json", "w") as file:
-#     json.dump(existing_data, file, indent=4, default=json_serial)
+cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+users_ref = db.collection("properties")
+docs = users_ref.stream()
+existing_data = []
+for doc in docs:
+    db_data = doc.to_dict()
+    existing_data.append(db_data)
+with open("db.json", "w") as file:
+    json.dump(existing_data, file, indent=4, default=json_serial)
 
 # =========================
 # Configuration
@@ -482,7 +482,7 @@ def calculate_final_accuracy(recommendations, user_houses, top_k=10):
 
 # =========================
 # Main Execution
-# =========================
+# =========================                 
 # Main pipeline for training and generating recommendations
 def run_pipeline(retrain_global=False):
     log("Loading data...")
