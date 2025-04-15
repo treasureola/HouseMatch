@@ -18,34 +18,36 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import firestore
 from google.cloud.firestore_v1._helpers import DatetimeWithNanoseconds
+import uuid
+from google.cloud.firestore_v1 import FieldFilter
 
 # =========================
 # Read from DB
 # =========================
-# def json_serial(obj):
-#     """JSON serializer for objects not serializable by default"""
-#     if isinstance(obj, DatetimeWithNanoseconds):
-#         return obj.isoformat()  # Convert to string format (ISO 8601)
-#     raise TypeError(f"Type {type(obj)} not serializable")
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default"""
+    if isinstance(obj, DatetimeWithNanoseconds):
+        return obj.isoformat()  # Convert to string format (ISO 8601)
+    raise TypeError(f"Type {type(obj)} not serializable")
 
-# cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
-# firebase_admin.initialize_app(cred)
-# db = firestore.client()
-# users_ref = db.collection("properties")
-# docs = users_ref.stream()
-# existing_data = []
-# for doc in docs:
-#     db_data = doc.to_dict()
-#     existing_data.append(db_data)
-# with open("db.json", "w") as file:
-#     json.dump(existing_data, file, indent=4, default=json_serial)
+cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+users_ref = db.collection("properties")
+docs = users_ref.stream()
+existing_data = []
+for doc in docs:
+    db_data = doc.to_dict()
+    existing_data.append(db_data)
+with open("db.json", "w") as file:
+    json.dump(existing_data, file, indent=4, default=json_serial)
 
 # =========================
 # Configuration
 # =========================
 # Define file paths and constants
-DATA_PATH = "synthetic_data.json"  # Path to property data
-# DATA_PATH = "db.json"  # Path to property data
+# DATA_PATH = "synthetic_data.json"  # Path to property data
+DATA_PATH = "db.json"  # Path to property data
 RECOMMENDATION_FILE = "recommendations.json"  # Output file for recommendations
 GLOBAL_MODEL_PATH = "global_model.h5"  # Path to save/load the global model
 SCALER_PATH = "scaler.npy"  # Path to save/load the scaler parameters
@@ -96,15 +98,14 @@ def process_property_interactions(house):
 # Build and return a compiled neural network model
 def build_model(input_dim):
     input_layer = Input(shape=(input_dim,))  # Input layer
-    x = Dense(128, activation="relu", kernel_regularizer=l2(0.01))(input_layer)  # Added L2 regularization
+    x = Dense(128, activation="relu", kernel_regularizer=l2(0.3))(input_layer)  # Added L2 regularization
     x = Dropout(0.8)(x)  # Increased dropout rate
-    x = Dense(64, activation="relu", kernel_regularizer=l2(0.01))(x)  # Added L2 regularization
+    x = Dense(64, activation="relu", kernel_regularizer=l2(0.3))(x)  # Added L2 regularization
     x = Dropout(0.8)(x)  # Increased dropout rate
     output_layer = Dense(1, activation="sigmoid")(x)  # Output layer for binary prediction
     model = Model(inputs=input_layer, outputs=output_layer)
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])  # Compile model
     return model
-
 
 # =========================
 # Data Loading and Prep
@@ -132,8 +133,6 @@ def train_global_model(user_houses):
     X_global, y_global = [], []
 
     # Extract training data and labels from all users
-    print(1111111)
-    print("houses",user_houses)
     for houses in user_houses.values():
         for house in houses:
             X_global.append(process_property_interactions(house))
@@ -161,7 +160,7 @@ def train_global_model(user_houses):
     # Fit the model with class weights
     
     # model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
-    model.fit(X_train, y_train, epochs=3, batch_size=200, class_weight=class_weight_dict, verbose=1)
+    model.fit(X_train, y_train, epochs=3, batch_size=10, class_weight=class_weight_dict, verbose=1)
 
     # Evaluate the model
     loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
@@ -206,98 +205,64 @@ def compute_user_preferences(user_houses):
 
     return user_preferences
  
-
 # =========================
-# Recommendation Engine
+# Recommendation Engine (Updated with Weights and Accuracy Calculation)
 # =========================
 # Generate personalized recommendations for each user
-def generate_recommendations(properties_list, user_houses, model, scaler):
-    log("Generating personalized recommendations...")
-    recommendations = {}
-
-    # Loop through each user to generate predictions
-    for user_id, houses in user_houses.items():
-        log(f"Processing user {user_id}")
-        X_user, y_user = [], []
-        for house in houses:
-            X_user.append(process_property_interactions(house))
-            y_user.append(1 if house.get("favorited", False) else 0)
-
-        # Skip users with too few interactions
-        if len(X_user) < 5:
-            log(f"User {user_id} skipped due to insufficient data.")
-            continue
-
-        X_user = np.array(X_user)
-        y_user = np.array(y_user)
-        X_user_scaled = scaler.transform(X_user)
-
-        # Split data into training and test sets for the user
-        X_train, X_test, y_train, y_test = train_test_split(X_user_scaled, y_user, test_size=0.2, random_state=42)
-
-        # Fine-tune model on user-specific data
-        user_model = tf.keras.models.clone_model(model)
-        user_model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
-        user_model.fit(X_train, y_train, epochs=3, batch_size=8, verbose=0)
-
-        # Evaluate the user model on test data
-        loss, accuracy = user_model.evaluate(X_test, y_test, verbose=0)
-        log(f"User {user_id} Model Accuracy: {accuracy * 100:.2f}%")
-
-        # Predict on unseen properties
-        liked_ids = {h["property_id"] for h in houses if h.get("favorited", False)}
-        user_recommendations = []
-
-        for house in properties_list:
-            if house["property_id"] in liked_ids:
-                continue
-            vector = process_property_interactions(house)
-            score = float(user_model.predict(scaler.transform([vector]), verbose=0)[0][0])
-            user_recommendations.append((house["property_id"], score))
-
-        # Sort and store top 5 recommendations
-        user_recommendations.sort(key=lambda x: x[1], reverse=True)
-        recommendations[user_id] = {pid: score for pid, score in user_recommendations[:5]}
-
-    return recommendations
-
 # Add recommendations from similar users using collaborative filtering
 def add_similar_user_recommendations(user_houses, recommendations):
-    log("Enhancing recommendations with similar user behavior using cosine similarity...")
+    log("Adding similar user recommendations...")
 
-    user_prefs = compute_user_preferences(user_houses)
-
+    # First, compute the behavior patterns for each user (based on their interactions)
+    user_behavior_vectors = {}
+    static_feature_length = 6  # Assuming there are 6 static features (price, bedrooms, bathrooms, square_feet, location, property_type)
+    
     for user_id, houses in user_houses.items():
-        # Get the user's preference vector (average of their liked houses)
-        if user_id not in user_prefs:
-            continue
-        user_pref = user_prefs[user_id]
+        vectors = []
+        for house in houses:
+            features = process_property_interactions(house)
+            vectors.append(features)
+        user_behavior_vectors[user_id] = np.mean(vectors, axis=0)  # Averaging interaction features
 
-        # Calculate cosine similarity to other users' preferences
-        preferences = np.array(list(user_prefs.values()))
-        cosine_similarities = cosine_similarity([user_pref], preferences)[0]  # Similarity to all other users
-        print(f"Cosine similarities for user {user_id}: {cosine_similarities}")
+    user_ids = list(user_behavior_vectors.keys())
+    behavior_matrix = np.array([user_behavior_vectors[uid] for uid in user_ids])
 
-        # Find similar users (ignore the user themselves at index 0)
-        similar_users = np.argsort(cosine_similarities)[::-1][1:6]  # Top 5 similar users
-        recommended_properties = set()
+    # Static preference comparison part (compare based on price, location, etc.)
+    static_preference_vectors = {}
+    for user_id, houses in user_houses.items():
+        static_preferences = np.mean([process_property_interactions(house)[-static_feature_length:] for house in houses], axis=0)  # Extracting the static features
+        static_preference_vectors[user_id] = static_preferences
 
-        for sim_idx in similar_users:
-            similar_user_id = list(user_prefs.keys())[sim_idx]
-            for house in user_houses.get(similar_user_id, []):
-                if house.get("favorited", False) and house["property_id"] not in recommended_properties:
-                    # Use cosine similarity as the score
-                    similarity_score = cosine_similarities[sim_idx]  # Similarity score based on cosine similarity
-                    recommended_properties.add(house["property_id"])
-                    recommendations.setdefault(user_id, {})[house["property_id"]] = similarity_score
+    static_preference_matrix = np.array([static_preference_vectors[uid] for uid in user_ids])
 
-        # Sort and trim to top 10 recommendations for each user
+    for i, user_id in enumerate(user_ids):
+        # Compare the current user's behavior to all others using cosine similarity
+        user_vector = behavior_matrix[i].reshape(1, -1)
+        behavior_similarities = cosine_similarity(user_vector, behavior_matrix)[0]
+        
+        # Compare the current user's static preferences to all others
+        static_user_vector = static_preference_matrix[i].reshape(1, -1)
+        static_similarities = cosine_similarity(static_user_vector, static_preference_matrix)[0]
+
+        # Combine both similarity scores (you can use weights if desired)
+        combined_similarities = (behavior_similarities + static_similarities) / 2  # Simple average for combining
+
+        # Get the indices of the most similar users (excluding the user themselves)
+        similar_indices = np.argsort(combined_similarities)[::-1][1:6]  # Top 5 most similar users
+
+        for idx in similar_indices:
+            sim_user_id = user_ids[idx]
+            for house in user_houses.get(sim_user_id, []):
+                if house.get("favorited", False):  # Only recommend favorited houses
+                    score = combined_similarities[idx]  # Combined score for ranking
+                    property_id = house["property_id"]
+                    if property_id not in recommendations.get(user_id, {}):
+                        recommendations.setdefault(user_id, {})[property_id] = score
+
         recommendations[user_id] = dict(sorted(recommendations[user_id].items(), key=lambda x: x[1], reverse=True)[:10])
 
-        # Print recommendation list after adding similar-user recommendations
-        log(f"Recommendations for user {user_id} after adding similar-user recommendations: {recommendations[user_id]}")
-
     return recommendations
+
 
 # Add recommendations from similar user preferences (third recommendation source)
 def add_preference_based_recommendations(user_houses, recommendations):
@@ -314,7 +279,7 @@ def add_preference_based_recommendations(user_houses, recommendations):
         # Calculate cosine similarity to other users' preferences
         preferences = np.array(list(user_prefs.values()))
         cosine_similarities = cosine_similarity([user_pref], preferences)[0]  # Similarity to all other users
-        print(f"Cosine similarities for user {user_id}: {cosine_similarities}")
+        # print(f"Cosine similarities for user {user_id}: {cosine_similarities}")
 
         # Find similar users (ignore the user themselves at index 0)
         similar_users = np.argsort(cosine_similarities)[::-1][1:6]  # Top 5 similar users
@@ -333,97 +298,246 @@ def add_preference_based_recommendations(user_houses, recommendations):
         recommendations[user_id] = dict(sorted(recommendations[user_id].items(), key=lambda x: x[1], reverse=True)[:10])
 
         # Print recommendation list after adding preference-based recommendations
-        log(f"Recommendations for user {user_id} after adding preference-based recommendations: {recommendations[user_id]}")
+        # log(f"Recommendations for user {user_id} after adding preference-based recommendations: {recommendations[user_id]}")
 
     return recommendations
 
-# =========================
-# Merge Recommendations
-# =========================
-def normalize_scores(source_scores, weight):
-    # Flatten all scores into a list to get the global max
-    all_scores = [score for user_scores in source_scores.values() for score in user_scores.values()]
-    max_score = max(all_scores) if all_scores else 1.0
+def generate_weighted_recommendations(properties_list, user_houses, model, scaler, behavior_weight, similar_user_weight, preference_weight):
+    log("Generating personalized recommendations with weighted merging...")
+    recommendations = {}
 
-    normalized = {}
-    for user_id, user_scores in source_scores.items():
-        normalized[user_id] = {}
-        for pid, score in user_scores.items():
-            normalized_score = (score / max_score) * weight
-            normalized[user_id][pid] = normalized_score
-    return normalized
+    for user_id, houses in user_houses.items():
+        log(f"Processing user {user_id}")
+        X_user, y_user = [], []
+        for house in houses:
+            X_user.append(process_property_interactions(house))
+            y_user.append(1 if house.get("favorited", False) else 0)
 
-# Merge recommendations from all sources into a final ranked list
-def merge_final_recommendations(behavioral_recs, similar_user_recs, preference_recs, top_n=10):
-    log("Merging final recommendations from all sources...")
+        if len(X_user) < 5:
+            log(f"User {user_id} skipped due to insufficient data.")
+            continue
 
-    # Normalize globally per source
-    behavioral_recs = normalize_scores(behavioral_recs, 0.6)
-    similar_user_recs = normalize_scores(similar_user_recs, 0.25)
-    preference_recs = normalize_scores(preference_recs, 0.15)
+        X_user = np.array(X_user)
+        y_user = np.array(y_user)
+        X_user_scaled = scaler.transform(X_user)
 
-    final_recommendations = {}
+        # Behavior-based Recommendations (Behavior Learning Model)
+        X_train, X_test, y_train, y_test = train_test_split(X_user_scaled, y_user, test_size=0.2, random_state=42)
+        user_model = tf.keras.models.clone_model(model)
+        user_model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+        user_model.fit(X_train, y_train, epochs=3, batch_size=10, verbose=0)
+        loss, accuracy = user_model.evaluate(X_test, y_test, verbose=0)
+        log(f"User {user_id} Model Accuracy: {accuracy * 100:.2f}%")
+        
+        # Calculate Behavior Model Accuracy
+        behavior_accuracy = accuracy * 100
+        log(f"Behavior-based recommendation accuracy for user {user_id}: {behavior_accuracy:.2f}%")
+        
+        liked_ids = {h["property_id"] for h in houses if h.get("favorited", False)}
+        behavior_recommendations = []
 
-    all_users = set(behavioral_recs.keys()).union(similar_user_recs.keys()).union(preference_recs.keys())
+        for house in properties_list:
+            if house["property_id"] in liked_ids:
+                continue
+            vector = process_property_interactions(house)
+            score = float(user_model.predict(scaler.transform([vector]), verbose=0)[0][0])
+            behavior_recommendations.append((house["property_id"], score))
 
-    for user_id in all_users:
-        scores = {}
+        # Sort by the behavior recommendation score
+        behavior_recommendations.sort(key=lambda x: x[1], reverse=True)
 
-        for rec_source in [behavioral_recs, similar_user_recs, preference_recs]:
-            if user_id in rec_source:
-                for pid, score in rec_source[user_id].items():
-                    scores[pid] = scores.get(pid, 0) + score
+        # Similar User Recommendations (Collaborative Filtering)
+        similar_user_recommendations = {}
+        similar_user_accuracy = 0  # Placeholder for collaborative filtering accuracy
+        for sim_user_id, sim_score in add_similar_user_recommendations(user_houses, {}).get(user_id, {}).items():
+            similar_user_recommendations[sim_user_id] = sim_score
+            # Simulate accuracy for similar user recommendations
+            # This can be replaced by a more sophisticated accuracy calculation based on shared likes or other criteria
+            similar_user_accuracy += sim_score
 
-        # Sort and select top N
-        sorted_recs = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:top_n]
-        final_recommendations[user_id] = {pid: round(score, 4) for pid, score in sorted_recs}
+        # Normalize similar user accuracy
+        if len(similar_user_recommendations) > 0:
+            similar_user_accuracy /= len(similar_user_recommendations)
+        similar_user_accuracy = similar_user_accuracy * 100
+        log(f"Similar user recommendation accuracy for user {user_id}: {similar_user_accuracy:.2f}%")
 
-        log(f"Final recommendations for user {user_id}: {final_recommendations[user_id]}")
+        # Preference-based Recommendations (Content-based Filtering)
+        preference_recommendations = {}
+        preference_accuracy = 0  # Placeholder for preference-based accuracy
+        for pref_user_id, pref_score in add_preference_based_recommendations(user_houses, {}).get(user_id, {}).items():
+            preference_recommendations[pref_user_id] = pref_score
+            # Simulate accuracy for preference-based recommendations
+            # Replace with real accuracy computation if applicable (e.g., matching user preferences)
+            preference_accuracy += pref_score
 
-    return final_recommendations
+        # Normalize preference accuracy
+        if len(preference_recommendations) > 0:
+            preference_accuracy /= len(preference_recommendations)
+        preference_accuracy = preference_accuracy * 100
+        log(f"Preference-based recommendation accuracy for user {user_id}: {preference_accuracy:.2f}%")
+
+        # Weighted Combination of Recommendations
+        merged_recommendations = {}
+
+        # Behavior-based recommendations
+        for prop_id, score in behavior_recommendations:
+            merged_recommendations[prop_id] = behavior_weight * score
+
+        # Add similar user recommendations
+        for prop_id, score in similar_user_recommendations.items():
+            merged_recommendations[prop_id] = merged_recommendations.get(prop_id, 0) + similar_user_weight * score
+
+        # Add preference-based recommendations
+        for prop_id, score in preference_recommendations.items():
+            merged_recommendations[prop_id] = merged_recommendations.get(prop_id, 0) + preference_weight * score
+
+        # Sort recommendations based on the merged weighted score
+        recommendations[user_id] = dict(sorted(merged_recommendations.items(), key=lambda x: x[1], reverse=True))
+        # Store final recommendations in Firestore
+        for user_id, property_scores in recommendations.items():
+            for property_id, score in property_scores.items():
+                # Check if this property is already assigned to this user
+                query = db.collection("properties") \
+                        .where(filter=FieldFilter("assignedUserID", "==", str(user_id))) \
+                        .where(filter=FieldFilter("property_id", "==", str(property_id))) \
+                        .stream()
+
+                if not any(query):
+                    # Get the original property
+                    original_query = db.collection("properties") \
+                   .where(filter=FieldFilter("property_id", "==", str(property_id))) \
+                   .limit(1) \
+                   .stream()
+
+                    found = False
+                    for doc in original_query:
+                        print(doc)
+                        found = True
+                        print(f"✅ Found property: {property_id}")
+                        original_data = doc.to_dict()
+                        original_data["assignedUserID"] = user_id
+                        # original_data["recommendation_score"] = score
+                        original_data["original_doc_id"] = doc.id
+
+                        new_doc_id = str(uuid.uuid4())
+                        print("📄 Creating new doc with ID:", new_doc_id)
+                        db.collection("properties").document(new_doc_id).set(original_data)
+
+                    if not found:
+                        print(f"❌ No matching property found for user {user_id} and property {property_id}")
+                else:
+                    print(f"ℹ️ Property {property_id} already assigned to user {user_id}. Skipping.")
+        print("\n")
+    return recommendations
+
+#     return final_recommendations
+def calculate_final_accuracy(recommendations, user_houses, top_k=10):
+    total_users = 0
+    total_hits = 0
+    total_precision = 0
+    total_recall = 0
+
+    for user_id, recs in recommendations.items():
+        recommended_ids = list(recs.keys())[:top_k]
+        actual_liked_ids = {house["property_id"] for house in user_houses.get(user_id, []) if house.get("favorited", False)}
+
+        if not actual_liked_ids:
+            continue
+
+        total_users += 1
+        hits = len(set(recommended_ids) & actual_liked_ids)
+
+        if hits > 0:
+            total_hits += 1
+
+        precision = hits / top_k
+        recall = hits / len(actual_liked_ids)
+
+        total_precision += precision
+        total_recall += recall
+
+    if total_users == 0:
+        return {"top_k_hit_rate": 0, "precision": 0, "recall": 0, "f1": 0}
+
+    avg_precision = total_precision / total_users
+    avg_recall = total_recall / total_users
+    f1 = 2 * (avg_precision * avg_recall) / (avg_precision + avg_recall + 1e-10)
+
+    return {
+        "top_k_hit_rate": total_hits / total_users,
+        "precision": avg_precision,
+        "recall": avg_recall,
+        "f1": f1,
+    }
 
 # =========================
 # Save to DB
 # =========================
+def save_all_user_property_scores_to_db(recommendations_dict):
+    for user_id, property_scores in recommendations_dict.items():
+        for property_id, score in property_scores.items():
+            # Query Firestore for a property with this ID and assigned to this user
+            query = db.collection("properties") \
+                      .where(filter=FieldFilter("assignedUserID", "==", str(user_id))) \
+                      .where(filter=FieldFilter("property_id", "==", str(property_id))) \
+                      .stream()
+
+            updated = False
+            for doc in query:
+                doc_ref = db.collection("properties").document(doc.id)
+                update_data = {
+                    "recommendation_score": float(score),
+                    "updated_at": firestore.SERVER_TIMESTAMP
+                }
+                doc_ref.set(update_data, merge=True)
+                print(f"✅ Updated: User {user_id} | Property {property_id} | Score {score:.4f}")
+                updated = True
+
+            if not updated:
+                print(f"⚠️ Skipped: No matching property found for user {user_id} and property {property_id}")
 
 # =========================
 # Main Execution
-# =========================
-
+# =========================                 
 # Main pipeline for training and generating recommendations
+# Train and return global model + scaler
+def retrain_global_model_only():
+    log("Retraining only the global model...")
+    properties_list = load_property_data(DATA_PATH)
+    user_houses = group_user_houses(properties_list)
+    model, scaler = train_global_model(user_houses)
+    return model, scaler
+
+# Run full recommendation pipeline (optional retrain)
 def run_pipeline(retrain_global=False):
-    log("Loading data...")
+    log("Running full pipeline...")
     properties_list = load_property_data(DATA_PATH)
     user_houses = group_user_houses(properties_list)
 
-    # Train global model or load if already trained
     if retrain_global or not os.path.exists(GLOBAL_MODEL_PATH):
         model, scaler = train_global_model(user_houses)
     else:
-        log("Loading pre-trained global model...")
         model = tf.keras.models.load_model(GLOBAL_MODEL_PATH)
         scaler = load_scaler()
 
-    # # Generate personalized recommendations
-    # recommendations = generate_recommendations(properties_list, user_houses, model, scaler)
+    recommendations = generate_weighted_recommendations(
+        properties_list,
+        user_houses,
+        model,
+        scaler,
+        behavior_weight=0.8,
+        similar_user_weight=0.1,
+        preference_weight=0.1
+    )
 
-    # # Add collaborative filtering recommendations
-    # recommendations = add_similar_user_recommendations(user_houses, recommendations)
+    save_all_user_property_scores_to_db(recommendations)
 
-    # Add preference-based recommendations
-    # recommendations = add_preference_based_recommendations(user_houses, recommendations)
-    # Step 3: Generate recommendations
-    
-    behavioral_recs = generate_recommendations(properties_list, user_houses, model, scaler)
-    similar_user_recs = add_similar_user_recommendations(user_houses, behavioral_recs.copy())
-    preference_recs = add_preference_based_recommendations(user_houses, behavioral_recs.copy())
+    accuracy_metrics = calculate_final_accuracy(recommendations, user_houses, top_k=10)
+    print("Final Recommendation Accuracy Metrics:")
+    print(accuracy_metrics)
 
-    # Step 4: Merge all into final recommendations
-    final_recommendations = merge_final_recommendations(behavioral_recs, similar_user_recs, preference_recs)
-
-    # Save final recommendations to file
     with open(RECOMMENDATION_FILE, 'w') as f:
-        json.dump(final_recommendations, f, indent=4)
+        json.dump(recommendations, f, indent=4)
     log(f"Recommendations saved to {RECOMMENDATION_FILE}")
 
 # Run the pipeline
