@@ -15,4 +15,5 @@ struct LikedHome: Identifiable {
     let bathrooms: Int
     let imageUrl: String
     let listingUrl: String
+    var orderingPos: Int   //this would be used for reordering (#1. Saving to DB)
 }
