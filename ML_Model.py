@@ -24,6 +24,7 @@ from google.cloud.firestore_v1 import FieldFilter
 import joblib
 from tensorflow.keras.callbacks import EarlyStopping
 
+
 # =========================
 # Configuration
 # =========================
@@ -48,7 +49,7 @@ def json_serial(obj):
 # db = firestore.client()
 
 # In ML_Model.py
-def refresh_firestore_data_to_json(filepath=DATA_PATH):
+def refresh_firestore_data_to_json(db, filepath="db.json"):
     users_ref = db.collection("properties")
     docs = users_ref.stream()
     existing_data = []
@@ -58,7 +59,7 @@ def refresh_firestore_data_to_json(filepath=DATA_PATH):
     with open(filepath, "w") as file:
         json.dump(existing_data, file, indent=4, default=json_serial)
 
-def refresh_firestore_data_to_json_for_user(user_id, filepath=PER_USER_DATA_PATH):
+def refresh_firestore_data_to_json_for_user(db, user_id, filepath="user.json"):
     users_ref = db.collection("properties").where(filter=FieldFilter("assignedUserID", "==", str(user_id)))
     docs = users_ref.stream()
     user_properties = []
