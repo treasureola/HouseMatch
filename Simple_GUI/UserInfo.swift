@@ -23,6 +23,22 @@ class UserInfo: ObservableObject {
     @Published var email: String = ""
     @Published var hasPreferences: Bool = false
     
+    @AppStorage("isNewUser") var isNewUser: Bool = true
+    @AppStorage("initialSwipeCount") var initialSwipeCount: Int = 0
+    
+    let maxInitialSwipes = 20
+    
+    func recordSwipeForNewUser() {
+        if isNewUser && initialSwipeCount < maxInitialSwipes {
+            initialSwipeCount += 1
+            if initialSwipeCount >= maxInitialSwipes {
+                isNewUser = false
+                print("User has completed initial swipes and is now a regular user.")
+            }
+             print("Initial swipe count: \(initialSwipeCount)")
+        }
+    }
+    
     func clear(){
         firstName = ""
         lastName = ""
