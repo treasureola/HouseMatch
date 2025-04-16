@@ -58,7 +58,7 @@ class PropertyViewModel: ObservableObject {
                     .whereField("assignedUserID", isEqualTo: userID)
                     .whereField("viewed", isEqualTo: false)
                     .whereField("city", isEqualTo: location)
-//                    .order(by: "recommendation_score", descending: true)
+                    .order(by: "recommendation_score", descending: true)
                     .limit(to: 100)
                     .getDocuments { (snapshot, error) in
                     if let error = error {
@@ -73,8 +73,14 @@ class PropertyViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.properties = snapshot?.documents.compactMap { doc -> Property? in
                             let data = doc.data()
+                            
+                            guard let score = data["recommendation_score"] as? Float else {
+                                return nil
+                            }
+                            
                             let amenitiesArray = data["amenities"] as? NSArray ?? []
                             let amenities = amenitiesArray.compactMap { $0 as? String } // Convert to Swift array
+                            
                             return Property(
                                 id: doc.documentID,
                                 propertyID: data["property_id"] as? String ?? "",
@@ -89,8 +95,8 @@ class PropertyViewModel: ObservableObject {
                                 bathrooms: data["bathrooms"] as? Int ?? 0,
                                 squareFeet: data["square_feet"] as? Int ?? 0,
                                 amenities: amenities,
-                                petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true
-//                                recommendationScore: data["recommendation_score"] as? Float ?? 0.0
+                                petFriendly: data["pet_policy.cats"] as? Bool == true || data["pet_policy.dogs"] as? Bool == true,
+                                recommendationScore: score
                             )
                         } ?? []
                         

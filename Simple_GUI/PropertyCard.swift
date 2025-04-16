@@ -14,7 +14,7 @@ import FirebaseFirestore
 struct PropertyCard: View {
     let property: Property
     var onRemove: (() -> Void)? // Callback when card is swiped
-
+    
     @State private var offset: CGSize = .zero
     @State private var color: Color = .white
     
@@ -32,7 +32,7 @@ struct PropertyCard: View {
     var isActive: Bool{
         return activePropertyID == property.id
     }
-
+    
     var body: some View {
         ZStack {
             color.edgesIgnoringSafeArea(.all)
@@ -88,6 +88,12 @@ struct PropertyCard: View {
                             .font(.subheadline)
                     }
                     
+                    Text(String(format: "⭐ %.1f%% Match", property.recommendationScore * 100))
+                        .font(.headline)
+                        .foregroundColor(.green)
+                        .padding(.top, 5)
+                    
+                    
                     Divider().padding(.vertical, 5)
                     
                     VStack(alignment: .center) {
@@ -103,7 +109,7 @@ struct PropertyCard: View {
                         } else {
                             let uniqueAmenities = Array(Set(property.amenities))
                             ForEach(uniqueAmenities, id: \.self) { amenity in
-//                                Text("• \(amenity)")
+                                //                                Text("• \(amenity)")
                                 Text("\(amenity)")
                                     .font(.footnote)
                                     .foregroundColor(.gray)
@@ -147,7 +153,7 @@ struct PropertyCard: View {
                         .fill(color)
                         .shadow(color: Color.gray.opacity(0.3), radius: 2, x: 0, y: 5)
                 )
-//                .cornerRadius(20)
+                //                .cornerRadius(20)
                 .shadow(radius: 2)
                 .onChange(of: isActive){ newValue in
                     if newValue {
@@ -165,7 +171,7 @@ struct PropertyCard: View {
                     .fill(color)
                     .shadow(color: Color.gray.opacity(0.3), radius: 2, x: 0, y: 5)
             )
-//            .cornerRadius(20)
+            //            .cornerRadius(20)
             .shadow(radius: 2)
             .offset(offset)
             .gesture(
@@ -202,7 +208,7 @@ struct PropertyCard: View {
                                 color = .white
                             }
                         }
-                 }
+                    }
             )
             .onChange(of: isActive) { newValue in
                 if newValue { entryTimestamp = Date() }
@@ -295,7 +301,7 @@ struct PropertyCard: View {
     func markPropertyAsViewed(_ property: Property) {
         let db = Firestore.firestore()
         let propertyRef = db.collection("properties").document(property.id)
-
+        
         propertyRef.updateData(["viewed": true]) { error in
             if let error = error {
                 print("Error updating viewed status: \(error.localizedDescription)")
@@ -312,25 +318,38 @@ struct PropertyCard: View {
         }
         
         let db = Firestore.firestore()
-        let likedHomeData: [String: Any] = [
-            "propertyID": property.propertyID,
-            "address": property.address,
-            "price": property.price,
-            "bedrooms": property.bedrooms,
-            "bathrooms": property.bathrooms,
-            "imageUrl": property.imageUrl,
-            "listingID": property.listingID,
-            "listingURL": property.listingURL,
-            "timestamp": Timestamp(),
-            "favorite": isFavorited,
-            "rating": determineRating()
-        ]
+        let likedHomesRef = db.collection("users").document(userID).collection("likedHomes")
         
-        db.collection("users").document(userID).collection("likedHomes").document(property.id).setData(likedHomeData){ error in
+        likedHomesRef.getDocuments { snapshot, error in
             if let error = error {
-                print("Error saving liked home: \(error.localizedDescription)")
-            } else {
-                print("Home liked and saved successfully!")
+                print("Error fetching liked homes: \(error.localizedDescription)")
+                return
+            }
+            
+            let currentCount = snapshot?.documents.count ?? 0
+            let orderingPos = currentCount
+            
+            let likedHomeData: [String: Any] = [
+                "propertyID": property.propertyID,
+                "address": property.address,
+                "price": property.price,
+                "bedrooms": property.bedrooms,
+                "bathrooms": property.bathrooms,
+                "imageUrl": property.imageUrl,
+                "listingID": property.listingID,
+                "listingURL": property.listingURL,
+                "timestamp": Timestamp(),
+                "favorite": isFavorited,
+                "rating": determineRating(),
+                "orderingPos": orderingPos
+            ]
+            
+            db.collection("users").document(userID).collection("likedHomes").document(property.id).setData(likedHomeData){ error in
+                if let error = error {
+                    print("Error saving liked home: \(error.localizedDescription)")
+                } else {
+                    print("Home liked and saved successfully!")
+                }
             }
         }
     }

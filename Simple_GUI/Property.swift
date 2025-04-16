@@ -23,5 +23,5 @@ struct Property: Identifiable {
     let squareFeet: Int
     let amenities: [String]
     let petFriendly: Bool
-//    let recommendationScore: Float
+    let recommendationScore: Float
 }

@@ -142,8 +142,8 @@ struct LoginScreenView: View {
                     Text("Sign Up")
                         .foregroundColor(.blue)
                 }
-                .padding(.top, 20)
             }
+            .padding(.top, 20)
         }
     }
     
@@ -590,7 +590,7 @@ struct FindDreamHome: View {
     let locations =
     ["Select Location"] + [
         "Washington, D.C.",
-        "New York City",
+        "New York",
         "Los Angeles",
         "Boston",
         "Chicago",

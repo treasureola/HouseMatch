@@ -12,6 +12,10 @@ import FirebaseFirestore
 
 struct LikedHomeRow: View {
     let home: LikedHome
+    
+    //new..
+    let isEditing: Bool
+    let deleteMode: Bool
 
     var body: some View {
         HStack {
@@ -38,8 +42,17 @@ struct LikedHomeRow: View {
                 Link("View", destination: url)
                     .foregroundColor(.blue)
             }
+            
+            //New..if we're in edit mode (rearrange) and not in delete mode display the drag image: "line.3.horizontal"
+            if isEditing && !deleteMode {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundColor(.gray)
+            }
+           
         }
+       
         .padding()
         .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6)))
+        
     }
 }
