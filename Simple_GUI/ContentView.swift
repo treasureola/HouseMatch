@@ -1,8 +1,3 @@
-
-
-
-//New integration part - Frontend !!
-
 //
 //  WelcomeView.swift
 //  Simple_GUI
@@ -142,8 +137,8 @@ struct LoginScreenView: View {
                     Text("Sign Up")
                         .foregroundColor(.blue)
                 }
+                .padding(.top, 20)
             }
-            .padding(.top, 20)
         }
     }
     
@@ -311,6 +306,43 @@ struct SignUpView: View {
         }
     }
     
+    // Frontend for BACKEND IMPLEMENTATION START : ISSOUF //
+       // THis functionality will handle the connection to the server and the double auth for our users loggin into our application. it also allows for routing and scaling within our vapor backend framework
+    func registerUser(email: String, completion: @escaping (Bool, String) -> Void) {
+        guard let url = URL(string: "http://13.218.5.40:8080/register") else {
+            print("Invalid backend URL")
+            completion(false, "Invalid backend URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: String] = [
+            "email": userInfo.email,
+            "firstName": userInfo.firstName,
+            "lastName": userInfo.lastName
+        ]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, let httpResponse = response as? HTTPURLResponse else {
+                completion(false, "No response from server")
+                return
+            }
+
+            if httpResponse.statusCode == 200 {
+                completion(true, "User registered successfully")
+            } else {
+                let responseMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
+                completion(false, responseMessage)
+            }
+        }.resume()
+    }
+
+       // Frontend for BACKEND IMPLEMENTATION END : ISSOUF  //
+    
     func canAttemptSignUp() -> Bool {
         return !userInfo.firstName.isEmpty &&
                 !userInfo.lastName.isEmpty &&
@@ -376,14 +408,13 @@ struct SignUpView: View {
         }
         generalError = ""
     }
-    
-    func handlingSignUp() {  //Was newly added
-        
-        print("In Handling SIgn Up")
+    // Modified by Issouf For backend integration
+    func handlingSignUp() {
+        print("In Handling Sign Up")
         
         generalError = ""
         
-        guard validateAllFields() else{
+        guard validateAllFields() else {
             print("Validation failed.")
             generalError = "Please fix the errors above"
             return
@@ -393,29 +424,57 @@ struct SignUpView: View {
         
         Auth.auth().createUser(withEmail: userInfo.email, password: password) { authResult, error in
             isLoading = false
+            
             if let error = error {
                 print("Error creating user: \(error.localizedDescription)")
                 generalError = error.localizedDescription
             } else if let user = authResult?.user {
                 print("User created successfully! UID: \(user.uid)")
-                saveUserData(uid: user.uid)
+                
+                let uid = user.uid
+                let userDoc = db.collection("users").document(uid)
+                let userData: [String: Any] = [
+                    "first_name": userInfo.firstName,
+                    "last_name": userInfo.lastName,
+                    "email": userInfo.email,
+                ]
+                
+                userDoc.setData(userData) { error in
+                    if let error = error {
+                        print("Firestore error: \(error.localizedDescription)")
+                        generalError = "Failed to save user data."
+                    } else {
+                        print("User saved in Firestore successfully!")
+                        
+                        // BAckend Integration Register on backend
+                        registerUser(email: userInfo.email) { success, message in
+                            if success {
+                                print("Backend registration successful: \(message)")
+                            } else {
+                                print("Backend registration failed: \(message)")
+                                generalError = message
+                            }
+                                // End of Backend Integration
+                        }
+                    }
+                }
                 
                 UserDefaults.standard.set(true, forKey: "showLogin")
                 
-                do{
+                do {
                     try Auth.auth().signOut()
-                    print("user signned out")
+                    print("User signed out")
                 } catch let signOutError {
                     print("Sign out error: \(signOutError.localizedDescription)")
                 }
                 
                 navigateToLogin = true
-            } else{
+            } else {
                 generalError = "An error occurred while creating your account."
             }
         }
     }
-    
+
     func saveUserData(uid: String){
         let userDoc = db.collection("users").document(uid)
         let userData: [String: Any] = [
@@ -590,7 +649,7 @@ struct FindDreamHome: View {
     let locations =
     ["Select Location"] + [
         "Washington, D.C.",
-        "New York",
+        "New York City",
         "Los Angeles",
         "Boston",
         "Chicago",
@@ -790,19 +849,19 @@ struct FindDreamHome: View {
     }
     
     func savePreferences() {
-        guard let userID = Auth.auth().currentUser?.uid else {
+        guard let user = Auth.auth().currentUser else {
             print("Error: No authenticated user found.")
             return
         }
+
         let (minPrice, maxPrice) = parsePriceRange(price)
-        let cleanSquareFeet = number_Of_SquareFeet.replacingOccurrences(
-            of: "+",
-            with: ""
-        )
-        let userDoc = db.collection("users").document(userID)
+        let cleanSquareFeet = number_Of_SquareFeet.replacingOccurrences(of: "+", with: "")
+
+        // Firestore Save
+        let userDoc = db.collection("users").document(user.uid)
         let preferences: [String: Any] = [
             "location": address,
-            "propertyType": propertyType,
+            "propertyType": property_type,
             "minPrice": minPrice,
             "maxPrice": maxPrice,
             "bedrooms": number_Of_Bedrooms,
@@ -810,19 +869,55 @@ struct FindDreamHome: View {
             "squareFeet": cleanSquareFeet,
             "timestamp": Timestamp(),
         ]
-        
+
         userDoc.setData(["preferences": preferences], merge: true) { error in
             if let error = error {
                 print("Error saving preferences: \(error.localizedDescription)")
             } else {
-                print("Preferences saved successfully")
+                print("Preferences saved successfully to Firestore")
                 DispatchQueue.main.async {
                     userInfo.hasPreferences = true
                 }
             }
         }
+
+        //  Backend Save
+        let url = URL(string: "http://13.218.5.40:8080/preferences")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        user.getIDToken { token, error in
+            guard let token = token else {
+                print("Token error: \(String(describing: error))")
+                return
+            }
+
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+            let backendBody: [String: Any] = [
+                "location": address,
+                "propertyType": property_type,
+                "minPrice": minPrice,
+                "maxPrice": maxPrice,
+                "bedrooms": Int(number_Of_Bedrooms) ?? 1,
+                "bathrooms": Int(number_Of_Bathrooms) ?? 1,
+                "squareFeet": Int(cleanSquareFeet) ?? 500
+            ]
+
+            request.httpBody = try? JSONSerialization.data(withJSONObject: backendBody)
+
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Backend error: \(error.localizedDescription)")
+                    return
+                }
+
+                print("Preferences saved to backend")
+            }.resume()
+        }
     }
-    
+
     func parsePriceRange(_ range: String) -> (Any, Any) {
         let numbers = range.components(
             separatedBy: CharacterSet.decimalDigits.inverted
@@ -967,10 +1062,7 @@ struct ThankYouPage: View {
     }
 }
 
-
-
                 
             #Preview {
                 WelcomeView()
             }
-

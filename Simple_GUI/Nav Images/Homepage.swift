@@ -25,24 +25,32 @@ struct Homepage: View {
     var body: some View {
         NavigationStack{
             ZStack{
-                Color.purple
+                
+                LinearGradient(gradient: Gradient(colors: [Color(red: 0, green: 0.2, blue: 0.4), Color(red: 0.2, green: 0.8, blue: 0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+
+                
+//                Color.purple
                 VStack{
                     VStack{
                         Text("About Us")
-                            .font(.largeTitle)
-                            .bold()
-                            .foregroundColor(.black)
-                            .padding(.top, 40)
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(1.0), radius: 4, x: 0, y: 6)
+                            .padding(.top, 40)
                         
                         
                         
                         
-                        Text("Discover apartments and houses tailored for you! Hit the button to find your match!")
-                            .font(.body)
-                            .padding(.horizontal)
-                            .multilineTextAlignment(.center)
-                            .transition(.opacity)
-                            .padding(.top, 40)
+                        Text("We are an ML-powered platform for matching ideal homes with tenants based on budget, location, preferences, and availability, while also helping landlords find suitable tenants in real time.")
+                            .font(.body)
+                            .foregroundColor(.white)
+            
+                            .padding(.horizontal)
+                            .multilineTextAlignment(.center)
+                            .bold()
+    //                        .transition(.opacity)
+                            .padding(.top, 40)
                         
                         Spacer()
                         
@@ -72,12 +80,12 @@ struct Homepage: View {
                         }) {
                             Text("View Properties")
                                 .font(.headline)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.orange)
-                                .cornerRadius(10)
-                                .padding(.top, 20)
-                                .padding(.bottom, 20)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color(red:0.5, green :0.0, blue:0.5))
+                                .cornerRadius(10)
+                                .padding(.top, 20)
+                                .padding(.bottom, 20)
                         }
                         
                         if isLoading{

@@ -29,6 +29,8 @@ struct PropertyCard: View {
     @State private var isFavorited = false
     @State private var showSaveToast = false
     
+    @EnvironmentObject var userInfo: UserInfo
+    
     var isActive: Bool{
         return activePropertyID == property.id
     }
@@ -84,14 +86,18 @@ struct PropertyCard: View {
                     
                     if property.petFriendly {
                         Text("🐾 Pet-Friendly")
-                            .foregroundColor(.green)
+                            .foregroundColor(.gray)
                             .font(.subheadline)
+                            .padding(.top, 5)
                     }
                     
-                    Text(String(format: "⭐ %.1f%% Match", property.recommendationScore * 100))
-                        .font(.headline)
-                        .foregroundColor(.green)
-                        .padding(.top, 5)
+                    if !userInfo.isNewUser || property.recommendationScore > 0 {
+                         Text(String(format: "⭐ %.1f%% Match", property.recommendationScore * 100))
+                            .font(.headline)
+                            .foregroundColor(.green)
+                            .padding(.top, 5)
+                    }
+
                     
                     
                     Divider().padding(.vertical, 5)
@@ -187,6 +193,11 @@ struct PropertyCard: View {
                             exitTimestamp = Date()
                             calculateTotalViewTime()
                             storeInteraction()
+                            
+                            if userInfo.isNewUser {
+                                userInfo.recordSwipeForNewUser()
+                                print("New user swipe recorded. Count: \(userInfo.initialSwipeCount)")
+                            }
                             
                             markPropertyAsViewed(property)
                             

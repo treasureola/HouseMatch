@@ -34,14 +34,14 @@ struct Preferences: View {
                         .font(.system(size: 90))
                         .padding(.top, 50)
                     
-                    Text("Customize Your Experience")
+                    Text("Edit Your Experience")
                         .foregroundColor(.white)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                     
                     Text("Set your preferences to find your dream home.")
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(.white.opacity(1.0))
                         .font(.subheadline)
                         .multilineTextAlignment(.center)
                         .padding()
