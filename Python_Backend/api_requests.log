@@ -1,4 +1,0 @@
-WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 1 of 3. Reason: timed out
-WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 2 of 3. Reason: timed out
-WARNING:google.auth.compute_engine._metadata:Compute Engine Metadata server unavailable on attempt 3 of 3. Reason: [Errno 64] Host is down
-WARNING:google.auth._default:Authentication failed using Compute Engine authentication due to unavailable metadata server.
