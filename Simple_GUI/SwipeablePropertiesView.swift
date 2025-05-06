@@ -35,8 +35,7 @@ struct SwipeablePropertiesView: View {
                          viewModel.fetchErrorMessage = nil
                          viewModel
                              .fetchProperties(
-                                userInfo: userInfo,
-                                isInitialLoad: true
+                                userInfo: userInfo, isInitialLoad: true
                              )
                      }
                      .padding()
@@ -51,7 +50,11 @@ struct SwipeablePropertiesView: View {
                              .padding()
                          // Optional: Button to manually trigger API check/refresh
                          Button("Check for New Properties") {
-                             viewModel.fetchProperties(userInfo: userInfo, isInitialLoad: false) // Trigger the fetch more logic
+                             viewModel
+                                 .fetchProperties(
+                                    userInfo: userInfo,
+                                    isInitialLoad: false
+                                 ) // Trigger the fetch more logic
                          }
                          .bold()
                          .foregroundColor(.white)
@@ -66,12 +69,18 @@ struct SwipeablePropertiesView: View {
                     // Automatically trigger fetch more when view appears and properties are empty
                     // Only trigger if not already loading to avoid loops
                     if !viewModel.isLoading {
-                         viewModel.fetchProperties(userInfo: userInfo, isInitialLoad: false) // Trigger fetch more logic
+                        viewModel
+                            .fetchProperties(
+                                userInfo: userInfo,
+                                isInitialLoad: false
+                            ) // Trigger fetch more logic
                     }
                  }
             } else {
                 ForEach(viewModel.properties) { property in
-                    PropertyCard(property: property, onRemove: {
+                    PropertyCard(
+property: property,
+ onRemove: {
                         // Remove the property from the list when swiped
                         viewModel.properties.removeAll { $0.id == property.id }
 
@@ -80,11 +89,17 @@ struct SwipeablePropertiesView: View {
                             activePropertyID = nextProperty.id
                         } else {
                             activePropertyID = nil
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                viewModel.fetchProperties(userInfo: userInfo, isInitialLoad: false)
+                            DispatchQueue.main
+                                .asyncAfter(deadline: .now() + 0.1) {
+                                    viewModel
+                                        .fetchProperties(
+                                            userInfo: userInfo,
+                                            isInitialLoad: false
+                                        )
                             }
                         }
-                    }, activePropertyID: $activePropertyID)
+                    },
+ activePropertyID: $activePropertyID)
                     .padding()
                 }
             }
@@ -94,16 +109,7 @@ struct SwipeablePropertiesView: View {
             // Fetch properties only if the list is currently empty on appear
             if viewModel.properties.isEmpty {
                 print("Initial fetch triggered on appear.")
-                viewModel.fetchProperties(userInfo: userInfo, isInitialLoad: true) { success in
-                    if success {
-                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Ensure properties load before setting active
-                            activePropertyID = viewModel.properties.first?.id
-                            initialLoadComplete = true // Mark initial load as done
-                        }
-                    } else {
-                        initialLoadComplete = true // Mark as done even if fetch failed
-                    }
-                }
+                viewModel.fetchProperties(userInfo: userInfo, isInitialLoad: false)
             } else {
                  print("Properties already loaded, skipping initial fetch on appear.")
                  initialLoadComplete = true // Already loaded
