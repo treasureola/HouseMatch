@@ -20,7 +20,8 @@ from ML_Model import (
 )
 
 # ========== Firebase Setup ==========
-cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+# cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+cred = credentials.Certificate(os.environ["FIREBASE_CREDENTIALS"])
 initialize_app(cred)
 db = admin_firestore.client()
 

@@ -1,3 +1,4 @@
 .build/
-.build/
-.build/
+*firebase-adminsdk*.json
+serviceAccount*.json
+.env

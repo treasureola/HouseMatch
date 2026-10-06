@@ -8,11 +8,13 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import firestore
+import os
 
 # __________INTEGRATION 1 _________ (LOAD DATA FROM DB)
 # Load categorized home dattails
 
-cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+# cred = credentials.Certificate("housematch-official-firebase-adminsdk-fbsvc-d0bd0d54c3.json")
+cred = credentials.Certificate(os.environ["FIREBASE_CREDENTIALS"])
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 doc_ref = db.collection("properties")
